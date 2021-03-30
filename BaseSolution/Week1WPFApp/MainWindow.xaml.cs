@@ -17,20 +17,29 @@ namespace Week1WPFApp
 
         public void ShowMessage()
         {
+            var output = GetGreating();
+            Greating.Content = output;
+        }
+
+        public string GetGreating()
+        {
             var args = Environment.GetCommandLineArgs();
             var validator = new NameValidator();
+            var text = "";
             if (args?.Length > 1)
             {
                 var name = args[1];
                 if (validator.Validate(name))
                 {
-                    Greating.Content = $"Hello, {name}!";
+                    text = $"Hello, {name}!";
                 }
             }
             else
             {
-                Greating.Content = $"Hello, {Environment.UserName}!";
+                text = $"Hello, {Environment.UserName}!";
             }
+
+            return text;
         }
     }
 }
