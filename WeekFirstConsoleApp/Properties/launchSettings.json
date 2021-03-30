@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "WeekFirstConsoleApp": {
+      "commandName": "Project",
+      "commandLineArgs": "hulio"
+    }
+  }
+}
