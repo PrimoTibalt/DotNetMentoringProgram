@@ -7,23 +7,26 @@ namespace WeekFirstConsoleApp.Printers
     {
         public static void AskNameToPrint()
         {
-            Console.WriteLine("Enter your name: ");
-            var name = Console.ReadLine();
+            var args = Environment.GetCommandLineArgs();
             var validator = new NameValidator();
-            Console.Clear();
-            if (validator.Validate(name))
+            if (args?.Length > 1)
             {
-                Console.WriteLine($"Hello, {name}!");
-                Console.ReadKey();
+                var name = args[1];
+                if (validator.Validate(name))
+                {
+                    Console.WriteLine($"Hello, {name}!");
+                }
+                else
+                {
+                    Console.WriteLine("Name should start with upper case symbol. Try again...");
+                }
             }
             else
             {
-                Console.WriteLine("Name should be without white spaces, digits or special symbols. Start the name with upper case symbol. Try again...");
-                Console.ReadKey();
-                ConsolePrinter.AskNameToPrint();
+                Console.WriteLine($"Hello, {Environment.UserName}!");
             }
 
-            return;
+            Console.ReadKey();
         }
     }
 }

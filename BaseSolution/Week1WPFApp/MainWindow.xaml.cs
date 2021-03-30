@@ -1,4 +1,5 @@
-﻿using System.Windows;
+﻿using System;
+using System.Windows;
 using WeekFirstConsoleApp.Validators;
 
 namespace Week1WPFApp
@@ -11,19 +12,24 @@ namespace Week1WPFApp
         public MainWindow()
         {
             InitializeComponent();
+            ShowMessage();
         }
 
-        private void Button_Click(object sender, RoutedEventArgs e)
+        public void ShowMessage()
         {
-            var name = InputText.Text;
+            var args = Environment.GetCommandLineArgs();
             var validator = new NameValidator();
-            if (validator.Validate(name))
+            if (args?.Length > 1)
             {
-                OutputText.Content = $"Hello, {name}!";
+                var name = args[1];
+                if (validator.Validate(name))
+                {
+                    Greating.Content = $"Hello, {name}!";
+                }
             }
             else
             {
-                OutputText.Content = "Name should be without white spaces, digits or special symbols. Start the name with upper case symbol. Try again...";
+                Greating.Content = $"Hello, {Environment.UserName}!";
             }
         }
     }
