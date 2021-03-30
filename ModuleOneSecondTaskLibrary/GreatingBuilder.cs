@@ -19,8 +19,8 @@ namespace ModuleOneSecondTaskLibrary
         public string Build()
         {
             var args = Environment.GetCommandLineArgs();
-            var name = args.Length > 1 ? args[1] : Environment.UserName;
-            return $"{DateTime.Now.ToLocalTime()} Hello, {name}!";
+            var name = args?.Length > 1 ? args[1] : Environment.UserName;
+            return $"{DateTime.Now.TimeOfDay} Hello, {name}!";
         }
     }
 }
