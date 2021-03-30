@@ -1,11 +1,21 @@
-﻿using System;
-using WeekFirstConsoleApp.Validators;
+﻿// <copyright file="ConsolePrinter.cs" company="PlaceholderCompany">
+// Copyright (c) PlaceholderCompany. All rights reserved.
+// </copyright>
 
 namespace WeekFirstConsoleApp.Printers
 {
+    using System;
+    using WeekFirstConsoleApp.Validators;
+
+    /// <summary>
+    /// Prints some text in CLI.
+    /// </summary>
     public class ConsolePrinter
     {
-        public static void AskNameToPrint()
+        /// <summary>
+        /// Prints greating with name from console attributes or if it wasn't provided with computer name.
+        /// </summary>
+        public static void PrintGreating()
         {
             var args = Environment.GetCommandLineArgs();
             var validator = new NameValidator();
