@@ -18,8 +18,8 @@ namespace WeekFirstConsoleApp
         /// <param name="args">Console attributes.</param>
         public static void Main(string[] args)
         {
-            var greatingBuilder = new GreatingBuilder();
-            Console.WriteLine(greatingBuilder.Build());
+            Console.WriteLine(GreatingBuilder.Build());
+            Console.Write("Click any button to exit program...");
             Console.ReadKey();
         }
     }

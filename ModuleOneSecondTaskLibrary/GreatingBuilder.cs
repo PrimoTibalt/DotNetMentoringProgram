@@ -9,14 +9,14 @@ namespace ModuleOneSecondTaskLibrary
     /// <summary>
     /// Builds greating text.
     /// </summary>
-    public class GreatingBuilder
+    public static class GreatingBuilder
     {
         /// <summary>
         /// Returns greating in format:
         /// «{current_time} Hello, {name}!».
         /// </summary>
         /// <returns>Greating text.</returns>
-        public string Build()
+        public static string Build()
         {
             var args = Environment.GetCommandLineArgs();
             var name = args?.Length > 1 ? args[1] : Environment.UserName;

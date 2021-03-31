@@ -26,8 +26,7 @@ namespace ModuleOneFirstTaskWPF
         /// </summary>
         public void ShowMessage()
         {
-            var builder = new GreatingBuilder();
-            this.Greating.Content = builder.Build();
+            this.Greating.Content = GreatingBuilder.Build();
         }
     }
 }
