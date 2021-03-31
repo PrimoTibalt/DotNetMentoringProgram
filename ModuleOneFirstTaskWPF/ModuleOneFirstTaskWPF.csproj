@@ -108,5 +108,11 @@
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\ModuleOneSecondTaskLibrary\ModuleOneSecondTaskLibrary.csproj">
+      <Project>{6b2af2dc-a659-4cdd-abcb-0bcecf703c9a}</Project>
+      <Name>ModuleOneSecondTaskLibrary</Name>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

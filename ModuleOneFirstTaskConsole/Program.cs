@@ -4,7 +4,8 @@
 
 namespace WeekFirstConsoleApp
 {
-    using WeekFirstConsoleApp.Printers;
+    using System;
+    using ModuleOneSecondTaskLibrary;
 
     /// <summary>
     /// Program runner.
@@ -17,7 +18,9 @@ namespace WeekFirstConsoleApp
         /// <param name="args">Console attributes.</param>
         public static void Main(string[] args)
         {
-            ConsolePrinter.PrintGreating();
+            Console.WriteLine(GreatingBuilder.Build());
+            Console.Write("Click any button to exit program...");
+            Console.ReadKey();
         }
     }
 }

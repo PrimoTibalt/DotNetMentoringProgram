@@ -4,9 +4,8 @@
 
 namespace ModuleOneFirstTaskWPF
 {
-    using System;
     using System.Windows;
-    using WeekFirstConsoleApp.Validators;
+    using ModuleOneSecondTaskLibrary;
 
     /// <summary>
     /// Interaction logic for MainWindow.xaml.
@@ -27,33 +26,7 @@ namespace ModuleOneFirstTaskWPF
         /// </summary>
         public void ShowMessage()
         {
-            var output = this.GetGreating();
-            this.Greating.Content = output;
-        }
-
-        /// <summary>
-        /// Creates greeting text with name from console attributes or if it wasn't provided with computer name.
-        /// </summary>
-        /// <returns>Greating text.</returns>
-        public string GetGreating()
-        {
-            var args = Environment.GetCommandLineArgs();
-            var validator = new NameValidator();
-            var text = string.Empty;
-            if (args?.Length > 1)
-            {
-                var name = args[1];
-                if (validator.Validate(name))
-                {
-                    text = $"Hello, {name}!";
-                }
-            }
-            else
-            {
-                text = $"Hello, {Environment.UserName}!";
-            }
-
-            return text;
+            this.Greating.Content = GreatingBuilder.Build();
         }
     }
 }
