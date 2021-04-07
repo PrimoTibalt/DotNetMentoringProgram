@@ -17,8 +17,8 @@ namespace ModuleOneFirstTaskWPF
         /// </summary>
         public MainWindow()
         {
-            this.InitializeComponent();
-            this.ShowMessage();
+            InitializeComponent();
+            ShowMessage();
         }
 
         /// <summary>
@@ -26,7 +26,7 @@ namespace ModuleOneFirstTaskWPF
         /// </summary>
         public void ShowMessage()
         {
-            this.Greating.Content = GreatingBuilder.Build();
+            Greating.Content = GreatingBuilder.Build();
         }
     }
 }
