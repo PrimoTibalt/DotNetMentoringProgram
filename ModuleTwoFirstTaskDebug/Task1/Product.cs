@@ -2,6 +2,8 @@
 // Copyright (c) PlaceholderCompany. All rights reserved.
 // </copyright>
 
+using System;
+
 namespace ModuleTwoDebugTask
 {
     /// <summary>
@@ -38,8 +40,12 @@ namespace ModuleTwoDebugTask
         /// <returns>Are name and price from input equal to name and price of this instance.</returns>
         public override bool Equals(object obj)
         {
-            var product = obj as Product;
-            return product?.Name == this.Name && product.Price == this.Price;
+            if (obj is Product p)
+            {
+                return p.Name == this.Name && p.Price == this.Price;
+            }
+
+            return false;
         }
 
         /// <summary>
@@ -48,7 +54,7 @@ namespace ModuleTwoDebugTask
         /// <returns>Hash code.</returns>
         public override int GetHashCode()
         {
-            return base.GetHashCode();
+            return HashCode.Combine(this.Name, this.Price);
         }
     }
 }
