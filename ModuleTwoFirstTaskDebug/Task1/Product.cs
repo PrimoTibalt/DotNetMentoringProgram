@@ -19,8 +19,8 @@ namespace ModuleTwoDebugTask
         /// <param name="price">Price.</param>
         public Product(string name, double price)
         {
-            this.Name = name;
-            this.Price = price;
+            Name = name;
+            Price = price;
         }
 
         /// <summary>
@@ -42,7 +42,7 @@ namespace ModuleTwoDebugTask
         {
             if (obj is Product p)
             {
-                return p.Name == this.Name && p.Price == this.Price;
+                return p.Name == Name && p.Price == Price;
             }
 
             return false;
@@ -54,7 +54,7 @@ namespace ModuleTwoDebugTask
         /// <returns>Hash code.</returns>
         public override int GetHashCode()
         {
-            return HashCode.Combine(this.Name, this.Price);
+            return HashCode.Combine(Name, Price);
         }
     }
 }
