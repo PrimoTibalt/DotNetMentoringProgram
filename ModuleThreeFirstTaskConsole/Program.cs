@@ -21,6 +21,7 @@ namespace ModuleThreeFirstTaskConsole
             var fs = new FileSystemVisitor(new DirectoryInfo(@"F:\Учёба, прога и т.п"), f => true);
             fs.SearchEnded += (sender, e) => Console.WriteLine($"Searching in {e.FullName} completed.");
             fs.SearchStarted += (sender, e) => Console.WriteLine($"Searching in {e.FullName} started.");
+            fs.FilteredDirectoryFound += (sender, e) => e.Exclude = e.Info.FullName.Contains("Udemy") ? true : false;
             foreach (var name in fs.Search())
             {
                 Console.WriteLine(name);

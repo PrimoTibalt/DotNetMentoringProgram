@@ -14,14 +14,15 @@ namespace ModuleThreeFirstTaskConsole
     public class FileSystemVisitor
     {
         private readonly DirectoryInfo fileSystem;
-        private readonly Predicate<FileInfo> filter;
+        private readonly Predicate<FileSystemInfo> filter;
+        private bool stoped = false;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="FileSystemVisitor"/> class.
         /// </summary>
         /// <param name="fileSystem">Files and directories.</param>
         /// <param name="filter">Filter of files and directories.</param>
-        public FileSystemVisitor(DirectoryInfo fileSystem, Predicate<FileInfo> filter)
+        public FileSystemVisitor(DirectoryInfo fileSystem, Predicate<FileSystemInfo> filter)
         {
             if (fileSystem is null)
             {
@@ -50,6 +51,26 @@ namespace ModuleThreeFirstTaskConsole
         public event EventHandler<FileSystemInfo> SearchEnded;
 
         /// <summary>
+        /// Events that happen when file is found.
+        /// </summary>
+        public event EventHandler<FileSystemEventArgs> FileFound;
+
+        /// <summary>
+        /// Events that happen when directory is found.
+        /// </summary>
+        public event EventHandler<FileSystemEventArgs> DirectoryFound;
+
+        /// <summary>
+        /// Events that happen when filtered file is found.
+        /// </summary>
+        public event EventHandler<FileSystemEventArgs> FilteredFileFound;
+
+        /// <summary>
+        /// Events that happen when filtered directory is found.
+        /// </summary>
+        public event EventHandler<FileSystemEventArgs> FilteredDirectoryFound;
+
+        /// <summary>
         /// Search files in provided fileSystem.
         /// </summary>
         /// <returns>Files from directories.</returns>
@@ -58,6 +79,11 @@ namespace ModuleThreeFirstTaskConsole
             OnSearchStarted(fileSystem);
             foreach (var info in GetAllFromCurrentDirectory(fileSystem))
             {
+                if (stoped)
+                {
+                    break;
+                }
+
                 yield return GetNameWithoutLongPath(info);
             }
 
@@ -79,7 +105,48 @@ namespace ModuleThreeFirstTaskConsole
         /// <param name="info">Provided info.</param>
         protected virtual void OnSearchEnded(FileSystemInfo info)
         {
+            stoped = false;
             SearchEnded?.Invoke(this, info);
+        }
+
+        /// <summary>
+        /// Invoke methods from FileFound event.
+        /// </summary>
+        /// <param name="args"></param>
+        protected virtual void OnFileFound(FileSystemEventArgs args)
+        {
+            FileFound?.Invoke(this, args);
+            stoped = args.Stop ? args.Stop : stoped;
+        }
+
+        /// <summary>
+        /// Invoke methods from DirectoryFound event.
+        /// </summary>
+        /// <param name="args"></param>
+        protected virtual void OnDirectoryFound(FileSystemEventArgs args)
+        {
+            DirectoryFound?.Invoke(this, args);
+            stoped = args.Stop ? args.Stop : stoped;
+        }
+
+        /// <summary>
+        /// Invoke methods from FilteredFileFound event.
+        /// </summary>
+        /// <param name="args"></param>
+        protected virtual void OnFilteredFileFound(FileSystemEventArgs args)
+        {
+            FilteredFileFound?.Invoke(this, args);
+            stoped = args.Stop ? args.Stop : stoped;
+        }
+
+        /// <summary>
+        /// Invoke methods from FilteredDirectoryFound event.
+        /// </summary>
+        /// <param name="args"></param>
+        protected virtual void OnFilteredDirectoryFound(FileSystemEventArgs args)
+        {
+            FilteredDirectoryFound?.Invoke(this, args);
+            stoped = args.Stop ? args.Stop : stoped;
         }
 
         /// <summary>
@@ -91,14 +158,26 @@ namespace ModuleThreeFirstTaskConsole
         {
             foreach (var directoryFromDirectory in directory.EnumerateDirectories())
             {
-                foreach (var file in GetAllFromCurrentDirectory(directoryFromDirectory))
+                var eventArgs = new FileSystemEventArgs
                 {
-                    yield return file;
-                }
+                    Info = directoryFromDirectory
+                };
+                OnDirectoryFound(eventArgs);
+                if (eventArgs.Exclude == false && filter(directoryFromDirectory))
+                {
+                    OnFilteredDirectoryFound(eventArgs);
+                    if (eventArgs.Exclude == false)
+                    {
+                        foreach (var file in GetAllFromCurrentDirectory(directoryFromDirectory))
+                        {
+                            yield return file;
+                        }
 
-                foreach (var file in GetFilesFromCurrentDirectory(directory))
-                {
-                    yield return file;
+                        foreach (var file in GetFilesFromCurrentDirectory(directoryFromDirectory))
+                        {
+                            yield return file;
+                        }
+                    }
                 }
             }
         }
@@ -112,9 +191,18 @@ namespace ModuleThreeFirstTaskConsole
         {
             foreach (var file in directoryInfo.EnumerateFiles())
             {
-                if (filter(file))
+                var eventArgs = new FileSystemEventArgs
                 {
-                    yield return file;
+                    Info = file
+                };
+                OnFileFound(eventArgs);
+                if (filter(file) && eventArgs.Exclude == false)
+                {
+                    OnFilteredFileFound(eventArgs);
+                    if (eventArgs.Exclude == false)
+                    {
+                        yield return file;
+                    }
                 }
             }
         }
