@@ -5,6 +5,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Threading.Tasks;
 
 namespace ModuleThreeFirstTaskConsole
 {
@@ -15,7 +16,6 @@ namespace ModuleThreeFirstTaskConsole
     {
         private readonly DirectoryInfo fileSystem;
         private readonly Predicate<FileSystemInfo> filter;
-        private bool stoped = false;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="FileSystemVisitor"/> class.
@@ -24,20 +24,10 @@ namespace ModuleThreeFirstTaskConsole
         /// <param name="filter">Filter of files and directories.</param>
         public FileSystemVisitor(DirectoryInfo fileSystem, Predicate<FileSystemInfo> filter)
         {
-            if (fileSystem is null)
-            {
-                throw new NullReferenceException(nameof(fileSystem));
-            }
-            else if (Directory.Exists(fileSystem.FullName))
-            {
-                this.fileSystem = fileSystem;
-            }
-            else
-            {
-                throw new DirectoryNotFoundException();
-            }
-
+            CheckInputOfConstructor(fileSystem);
+            this.fileSystem = fileSystem;
             this.filter = filter is null ? x => true : filter;
+            Stoped = true;
         }
 
         /// <summary>
@@ -71,15 +61,20 @@ namespace ModuleThreeFirstTaskConsole
         public event EventHandler<FileSystemEventArgs> FilteredDirectoryFound;
 
         /// <summary>
+        /// State of searching. If it's true on the next step except for search start the visitor will not proceed to work.
+        /// </summary>
+        public bool Stoped { get; set; }
+
+        /// <summary>
         /// Search files in provided fileSystem.
         /// </summary>
         /// <returns>Files from directories.</returns>
-        public IEnumerable<string> Search()
+        public async IAsyncEnumerable<string> Search()
         {
             OnSearchStarted(fileSystem);
-            foreach (var info in GetAllFromCurrentDirectory(fileSystem))
+            await foreach (var info in GetAllFromCurrentDirectory(fileSystem))
             {
-                if (stoped)
+                if (Stoped)
                 {
                     break;
                 }
@@ -96,6 +91,7 @@ namespace ModuleThreeFirstTaskConsole
         /// <param name="info">Provided info.</param>
         protected virtual void OnSearchStarted(FileSystemInfo info)
         {
+            Stoped = false;
             SearchStarted?.Invoke(this, info);
         }
 
@@ -105,7 +101,7 @@ namespace ModuleThreeFirstTaskConsole
         /// <param name="info">Provided info.</param>
         protected virtual void OnSearchEnded(FileSystemInfo info)
         {
-            stoped = false;
+            Stoped = true;
             SearchEnded?.Invoke(this, info);
         }
 
@@ -116,7 +112,7 @@ namespace ModuleThreeFirstTaskConsole
         protected virtual void OnFileFound(FileSystemEventArgs args)
         {
             FileFound?.Invoke(this, args);
-            stoped = args.Stop ? args.Stop : stoped;
+            Stoped = args.Stop ? args.Stop : Stoped;
         }
 
         /// <summary>
@@ -126,7 +122,7 @@ namespace ModuleThreeFirstTaskConsole
         protected virtual void OnDirectoryFound(FileSystemEventArgs args)
         {
             DirectoryFound?.Invoke(this, args);
-            stoped = args.Stop ? args.Stop : stoped;
+            Stoped = args.Stop ? args.Stop : Stoped;
         }
 
         /// <summary>
@@ -136,7 +132,7 @@ namespace ModuleThreeFirstTaskConsole
         protected virtual void OnFilteredFileFound(FileSystemEventArgs args)
         {
             FilteredFileFound?.Invoke(this, args);
-            stoped = args.Stop ? args.Stop : stoped;
+            Stoped = args.Stop ? args.Stop : Stoped;
         }
 
         /// <summary>
@@ -146,7 +142,7 @@ namespace ModuleThreeFirstTaskConsole
         protected virtual void OnFilteredDirectoryFound(FileSystemEventArgs args)
         {
             FilteredDirectoryFound?.Invoke(this, args);
-            stoped = args.Stop ? args.Stop : stoped;
+            Stoped = args.Stop ? args.Stop : Stoped;
         }
 
         /// <summary>
@@ -154,7 +150,7 @@ namespace ModuleThreeFirstTaskConsole
         /// </summary>
         /// <param name="directory">Provided directory.</param>
         /// <returns>FileInfo of each file and directory.</returns>
-        private IEnumerable<FileSystemInfo> GetAllFromCurrentDirectory(DirectoryInfo directory)
+        private async IAsyncEnumerable<FileSystemInfo> GetAllFromCurrentDirectory(DirectoryInfo directory)
         {
             foreach (var directoryFromDirectory in directory.EnumerateDirectories())
             {
@@ -168,12 +164,12 @@ namespace ModuleThreeFirstTaskConsole
                     OnFilteredDirectoryFound(eventArgs);
                     if (eventArgs.Exclude == false)
                     {
-                        foreach (var file in GetAllFromCurrentDirectory(directoryFromDirectory))
+                        await foreach (var file in GetAllFromCurrentDirectory(directoryFromDirectory))
                         {
                             yield return file;
                         }
 
-                        foreach (var file in GetFilesFromCurrentDirectory(directoryFromDirectory))
+                        await foreach (var file in GetFilesFromCurrentDirectory(directoryFromDirectory))
                         {
                             yield return file;
                         }
@@ -187,9 +183,10 @@ namespace ModuleThreeFirstTaskConsole
         /// </summary>
         /// <param name="directoryInfo">Current direcotry.</param>
         /// <returns>Files from directory.</returns>
-        private IEnumerable<FileInfo> GetFilesFromCurrentDirectory(DirectoryInfo directoryInfo)
+        private async IAsyncEnumerable<FileInfo> GetFilesFromCurrentDirectory(DirectoryInfo directoryInfo)
         {
-            foreach (var file in directoryInfo.EnumerateFiles())
+            var filesTask = await Task.Run(directoryInfo.EnumerateFiles);
+            foreach (var file in filesTask)
             {
                 var eventArgs = new FileSystemEventArgs
                 {
@@ -215,6 +212,18 @@ namespace ModuleThreeFirstTaskConsole
         private string GetNameWithoutLongPath(FileSystemInfo file)
         {
             return file.FullName.Replace(fileSystem.FullName, string.Empty);
+        }
+
+        private void CheckInputOfConstructor(DirectoryInfo fileSystem)
+        {
+            if (fileSystem is null)
+            {
+                throw new NullReferenceException(nameof(fileSystem));
+            }
+            else if (Directory.Exists(fileSystem.FullName) == false)
+            {
+                throw new DirectoryNotFoundException();
+            }
         }
     }
 }
