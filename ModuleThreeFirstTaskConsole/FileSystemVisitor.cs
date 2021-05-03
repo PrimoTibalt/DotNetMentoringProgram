@@ -6,7 +6,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.IO.Abstractions;
-using System.Linq;
 
 namespace ModuleThreeFirstTaskConsole
 {
@@ -15,6 +14,8 @@ namespace ModuleThreeFirstTaskConsole
     /// </summary>
     public class FileSystemVisitor
     {
+        private const string STANDARDPATH = @"C:\";
+
         private readonly IFileSystem _fileSystem;
         private readonly Func<IFileSystemInfo, bool> _filter;
         private readonly string _initialPath;
@@ -32,7 +33,8 @@ namespace ModuleThreeFirstTaskConsole
         {
             _fileSystem = fileSystem ?? throw new ArgumentNullException(nameof(fileSystem));
             _filter = filter is null ? x => true : filter;
-            _initialPath = initialPath;
+            _initialPath = initialPath ?? STANDARDPATH;
+            _initialPath = _fileSystem.Directory.Exists(initialPath) ? initialPath : throw new DirectoryNotFoundException("You entered path that doesn't exist.");
             Stoped = true;
         }
 
@@ -117,7 +119,7 @@ namespace ModuleThreeFirstTaskConsole
                 }
             }
 
-            if (directory.FullName.Equals(@"C:\"))
+            if (directory.FullName.Equals(STANDARDPATH))
             {
                 foreach (var file in ProcessRootDirectory(directory))
                 {
