@@ -14,59 +14,56 @@ namespace ModuleThreeFirstTaskConsole
     /// </summary>
     public class FileSystemVisitor
     {
-        private const string STANDARDPATH = @"C:\";
+        private const string STANDARDWINDOWSPATH = @"C:\";
+        private const string STANDARDLINUXPATH = @"/";
 
         private readonly IFileSystem _fileSystem;
         private readonly Func<IFileSystemInfo, bool> _filter;
-        private readonly string _initialPath;
+        private string _initialPath;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="FileSystemVisitor"/> class.
         /// </summary>
         /// <param name="fileSystem">Files and directories.</param>
         /// <param name="filter">Filter of files and directories.</param>
-        /// <param name="initialPath">Place in filesystem where to start searching.</param>
         public FileSystemVisitor(
             IFileSystem fileSystem,
-            Func<IFileSystemInfo, bool> filter,
-            string initialPath)
+            Func<IFileSystemInfo, bool> filter)
         {
             _fileSystem = fileSystem ?? throw new ArgumentNullException(nameof(fileSystem));
             _filter = filter is null ? x => true : filter;
-            _initialPath = initialPath ?? STANDARDPATH;
-            _initialPath = _fileSystem.Directory.Exists(initialPath) ? initialPath : throw new DirectoryNotFoundException("You entered path that doesn't exist.");
             Stoped = true;
         }
 
         /// <summary>
         /// Events that happen at the begin of search.
         /// </summary>
-        public event EventHandler<IFileSystemInfo> SearchStarted;
+        public event Action<IFileSystemInfo> SearchStarted;
 
         /// <summary>
         /// Events that happen at the end of search.
         /// </summary>
-        public event EventHandler<IFileSystemInfo> SearchEnded;
+        public event Action<IFileSystemInfo> SearchEnded;
 
         /// <summary>
         /// Events that happen when file is found.
         /// </summary>
-        public event EventHandler<FileSystemEventArgs> FileFound;
+        public event Action<FileSystemEventArgs> FileFound;
 
         /// <summary>
         /// Events that happen when directory is found.
         /// </summary>
-        public event EventHandler<FileSystemEventArgs> DirectoryFound;
+        public event Action<FileSystemEventArgs> DirectoryFound;
 
         /// <summary>
         /// Events that happen when filtered file is found.
         /// </summary>
-        public event EventHandler<FileSystemEventArgs> FilteredFileFound;
+        public event Action<FileSystemEventArgs> FilteredFileFound;
 
         /// <summary>
         /// Events that happen when filtered directory is found.
         /// </summary>
-        public event EventHandler<FileSystemEventArgs> FilteredDirectoryFound;
+        public event Action<FileSystemEventArgs> FilteredDirectoryFound;
 
         /// <summary>
         /// State of searching. If it's true on the next step except for search start the visitor will not proceed to work.
@@ -77,12 +74,14 @@ namespace ModuleThreeFirstTaskConsole
         /// Search files in provided fileSystem.
         /// </summary>
         /// <returns>Files from directories.</returns>
-        public async IAsyncEnumerable<string> Search()
+        /// <param name="initialPath">Place in filesystem where to start searching.</param>
+        public IEnumerable<string> Search(string initialPath)
         {
+            SetInitialPath(initialPath);
             var initialDiractoryName = _fileSystem.Path.GetDirectoryName(_initialPath);
             var directory = _fileSystem.DirectoryInfo.FromDirectoryName(initialDiractoryName ?? _fileSystem.Directory.GetCurrentDirectory());
             OnSearchStarted(directory);
-            await foreach (var info in GetAllFromCurrentDirectory(directory))
+            foreach (var info in GetAllFromCurrentDirectory(directory))
             {
                 yield return GetNameWithoutLongPath(info);
                 if (Stoped)
@@ -99,7 +98,7 @@ namespace ModuleThreeFirstTaskConsole
         /// </summary>
         /// <param name="directory">Provided directory.</param>
         /// <returns>FileInfo of each file and directory.</returns>
-        private async IAsyncEnumerable<IFileSystemInfo> GetAllFromCurrentDirectory(IFileSystemInfo directory)
+        private IEnumerable<IFileSystemInfo> GetAllFromCurrentDirectory(IFileSystemInfo directory)
         {
             foreach (var directoryName in _fileSystem.Directory.EnumerateDirectories(directory.FullName))
             {
@@ -107,7 +106,7 @@ namespace ModuleThreeFirstTaskConsole
                 var results = ProcessFileSystemObject(directoryInfo);
                 if (!results.Exclude)
                 {
-                    await foreach (var file in GetAllFromCurrentDirectory(directoryInfo))
+                    foreach (var file in GetAllFromCurrentDirectory(directoryInfo))
                     {
                         yield return file;
                     }
@@ -119,7 +118,7 @@ namespace ModuleThreeFirstTaskConsole
                 }
             }
 
-            if (directory.FullName.Equals(STANDARDPATH))
+            if (directory.FullName.Equals(STANDARDWINDOWSPATH))
             {
                 foreach (var file in ProcessRootDirectory(directory))
                 {
@@ -143,23 +142,20 @@ namespace ModuleThreeFirstTaskConsole
         private void OnSearchStarted(IFileSystemInfo info)
         {
             Stoped = false;
-            SearchStarted?.Invoke(this, info);
+            SearchStarted?.Invoke(info);
         }
 
         private void OnSearchEnded(IFileSystemInfo info)
         {
             Stoped = true;
-            SearchEnded?.Invoke(this, info);
+            SearchEnded?.Invoke(info);
         }
 
         private FileSystemEventArgs ProcessFileSystemObject(IFileSystemInfo info)
         {
             var isDirecotry = info.Attributes.HasFlag(FileAttributes.Directory);
             var isIgnored = isDirecotry ? false : !_filter(info);
-            var args = new FileSystemEventArgs
-            {
-                Info = info
-            };
+            var args = new FileSystemEventArgs(info);
 
             var handler = isDirecotry
                 ? isIgnored
@@ -169,7 +165,7 @@ namespace ModuleThreeFirstTaskConsole
                     ? FileFound
                     : FilteredFileFound;
 
-            handler?.Invoke(this, args);
+            handler?.Invoke(args);
             args.Exclude = args.Exclude || isIgnored;
             Stoped = args.Stop;
             return args;
@@ -191,6 +187,23 @@ namespace ModuleThreeFirstTaskConsole
         private string GetNameWithoutLongPath(IFileSystemInfo file)
         {
             return file.FullName.Replace(_initialPath, string.Empty);
+        }
+
+        private void SetInitialPath(string initialPath)
+        {
+            string standardPath = null;
+            if (_fileSystem.Directory.Exists(STANDARDWINDOWSPATH))
+            {
+                standardPath = STANDARDWINDOWSPATH;
+            }
+
+            if (_fileSystem.Directory.Exists(STANDARDWINDOWSPATH))
+            {
+                standardPath = STANDARDLINUXPATH;
+            }
+
+            _initialPath = initialPath ?? standardPath ?? throw new ArgumentException("File system isn't linux or windows like.");
+            _initialPath = _fileSystem.Directory.Exists(initialPath) ? initialPath : throw new DirectoryNotFoundException("You entered path that doesn't exist.");
         }
     }
 }
