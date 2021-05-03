@@ -22,15 +22,6 @@ namespace ModuleThreeFirstTaskConsole
         /// <param name="args">Console args.</param>
         public static void Main(string[] args)
         {
-            MainAsync().GetAwaiter().GetResult();
-        }
-
-        /// <summary>
-        /// Runs async FileSystemVisitor.
-        /// </summary>
-        /// <returns></returns>
-        public static async Task MainAsync()
-        {
             var fileSystem = new MockFileSystem(new Dictionary<string, MockFileData>
             {
                 { @"c:\myfile.txt", new MockFileData("Testing is meh.") },
@@ -62,12 +53,11 @@ namespace ModuleThreeFirstTaskConsole
                 { @"c:\fate\stay\night\unlimited\blade\works\heavens\feel\apocrif\prototype\tsukihime\moon\princess\arkveit.gif", new MockFileData(new byte[] { 0x12, 0x34, 0x56, 0xd2 }) }
             });
 
-            var fs = new FileSystemVisitor(fileSystem, f => true, @"c:\");
-            fs.SearchEnded += (sender, e) => Console.WriteLine($"Searching in {e.FullName} completed.");
-            fs.SearchStarted += (sender, e) => Console.WriteLine($"Searching in {e.FullName} started.");
-            fs.FilteredDirectoryFound += (sender, e) => e.Exclude = false;
-            var task = Task.Run(fs.Search);
-            await foreach (var name in task.GetAwaiter().GetResult())
+            var fs = new FileSystemVisitor(fileSystem, f => true);
+            fs.SearchEnded += (e) => Console.WriteLine($"Searching in {e.FullName} completed.");
+            fs.SearchStarted += (e) => Console.WriteLine($"Searching in {e.FullName} started.");
+            fs.FilteredDirectoryFound += (e) => e.Exclude = false;
+            foreach (var name in fs.Search(@"c:\"))
             {
                 Console.WriteLine(name);
             }

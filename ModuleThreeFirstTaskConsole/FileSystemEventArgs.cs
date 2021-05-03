@@ -9,9 +9,18 @@ namespace ModuleThreeFirstTaskConsole
     public class FileSystemEventArgs : EventArgs
     {
         /// <summary>
+        /// Sets info property.
+        /// </summary>
+        /// <param name="info"></param>
+        public FileSystemEventArgs(IFileSystemInfo info)
+        {
+            Info = info;
+        }
+
+        /// <summary>
         /// Information about file or directory.
         /// </summary>
-        public IFileSystemInfo Info { get; set; }
+        public IFileSystemInfo Info { get; }
 
         /// <summary>
         /// If checked - Search action will be stopped.

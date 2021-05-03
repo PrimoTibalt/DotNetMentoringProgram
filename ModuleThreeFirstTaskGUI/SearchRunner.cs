@@ -61,7 +61,7 @@ namespace ModuleThreeFirstTaskGUI
         /// <summary>
         /// Run search async.
         /// </summary>
-        public async Task RunSearch()
+        public void RunSearch()
         {
             var fileSystem = new MockFileSystem(new Dictionary<string, MockFileData>
             {
@@ -93,9 +93,9 @@ namespace ModuleThreeFirstTaskGUI
                 { @"c:\fate\Saber.js", new MockFileData("some js") },
                 { @"c:\fate\stay\night\unlimited\blade\works\heavens\feel\apocrif\prototype\tsukihime\moon\princess\arkveit.gif", new MockFileData(new byte[] { 0x12, 0x34, 0x56, 0xd2 }) }
             });
-            var visitor = new FileSystemVisitor(fileSystem, _predicate, FilePath);
+            var visitor = new FileSystemVisitor(fileSystem, _predicate);
             var list = new List<string>();
-            await foreach (var result in visitor.Search())
+            foreach (var result in visitor.Search(FilePath))
             {
                 Dispatcher.Invoke(() => _window.FilesView.Items.Add(result));
             }
