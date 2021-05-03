@@ -1,5 +1,5 @@
 ﻿using System;
-using System.IO;
+using System.IO.Abstractions;
 
 namespace ModuleThreeFirstTaskConsole
 {
@@ -11,7 +11,7 @@ namespace ModuleThreeFirstTaskConsole
         /// <summary>
         /// Information about file or directory.
         /// </summary>
-        public FileSystemInfo Info { get; set; }
+        public IFileSystemInfo Info { get; set; }
 
         /// <summary>
         /// If checked - Search action will be stopped.

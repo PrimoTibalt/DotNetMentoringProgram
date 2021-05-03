@@ -5,7 +5,8 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Threading.Tasks;
+using System.IO.Abstractions;
+using System.Linq;
 
 namespace ModuleThreeFirstTaskConsole
 {
@@ -14,31 +15,36 @@ namespace ModuleThreeFirstTaskConsole
     /// </summary>
     public class FileSystemVisitor
     {
-        private readonly DirectoryInfo fileSystem;
-        private readonly Predicate<FileSystemInfo> filter;
+        private readonly IFileSystem _fileSystem;
+        private readonly Func<IFileSystemInfo, bool> _filter;
+        private readonly string _initialPath;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="FileSystemVisitor"/> class.
         /// </summary>
         /// <param name="fileSystem">Files and directories.</param>
         /// <param name="filter">Filter of files and directories.</param>
-        public FileSystemVisitor(DirectoryInfo fileSystem, Predicate<FileSystemInfo> filter)
+        /// <param name="initialPath">Place in filesystem where to start searching.</param>
+        public FileSystemVisitor(
+            IFileSystem fileSystem,
+            Func<IFileSystemInfo, bool> filter,
+            string initialPath)
         {
-            CheckInputOfConstructor(fileSystem);
-            this.fileSystem = fileSystem;
-            this.filter = filter is null ? x => true : filter;
+            _fileSystem = fileSystem ?? throw new ArgumentNullException(nameof(fileSystem));
+            _filter = filter is null ? x => true : filter;
+            _initialPath = initialPath;
             Stoped = true;
         }
 
         /// <summary>
         /// Events that happen at the begin of search.
         /// </summary>
-        public event EventHandler<FileSystemInfo> SearchStarted;
+        public event EventHandler<IFileSystemInfo> SearchStarted;
 
         /// <summary>
         /// Events that happen at the end of search.
         /// </summary>
-        public event EventHandler<FileSystemInfo> SearchEnded;
+        public event EventHandler<IFileSystemInfo> SearchEnded;
 
         /// <summary>
         /// Events that happen when file is found.
@@ -71,8 +77,10 @@ namespace ModuleThreeFirstTaskConsole
         /// <returns>Files from directories.</returns>
         public async IAsyncEnumerable<string> Search()
         {
-            OnSearchStarted(fileSystem);
-            await foreach (var info in GetAllFromCurrentDirectory(fileSystem))
+            var initialDiractoryName = _fileSystem.Path.GetDirectoryName(_initialPath);
+            var directory = _fileSystem.DirectoryInfo.FromDirectoryName(initialDiractoryName ?? _fileSystem.Directory.GetCurrentDirectory());
+            OnSearchStarted(directory);
+            await foreach (var info in GetAllFromCurrentDirectory(directory))
             {
                 if (Stoped)
                 {
@@ -82,148 +90,106 @@ namespace ModuleThreeFirstTaskConsole
                 yield return GetNameWithoutLongPath(info);
             }
 
-            OnSearchEnded(fileSystem);
+            OnSearchEnded(directory);
         }
 
         /// <summary>
-        /// Invoke methods from SearchStarted event.
-        /// </summary>
-        /// <param name="info">Provided info.</param>
-        protected virtual void OnSearchStarted(FileSystemInfo info)
-        {
-            Stoped = false;
-            SearchStarted?.Invoke(this, info);
-        }
-
-        /// <summary>
-        /// Invoke methods from SearchEnded event.
-        /// </summary>
-        /// <param name="info">Provided info.</param>
-        protected virtual void OnSearchEnded(FileSystemInfo info)
-        {
-            Stoped = true;
-            SearchEnded?.Invoke(this, info);
-        }
-
-        /// <summary>
-        /// Invoke methods from FileFound event.
-        /// </summary>
-        /// <param name="args"></param>
-        protected virtual void OnFileFound(FileSystemEventArgs args)
-        {
-            FileFound?.Invoke(this, args);
-            Stoped = args.Stop ? args.Stop : Stoped;
-        }
-
-        /// <summary>
-        /// Invoke methods from DirectoryFound event.
-        /// </summary>
-        /// <param name="args"></param>
-        protected virtual void OnDirectoryFound(FileSystemEventArgs args)
-        {
-            DirectoryFound?.Invoke(this, args);
-            Stoped = args.Stop ? args.Stop : Stoped;
-        }
-
-        /// <summary>
-        /// Invoke methods from FilteredFileFound event.
-        /// </summary>
-        /// <param name="args"></param>
-        protected virtual void OnFilteredFileFound(FileSystemEventArgs args)
-        {
-            FilteredFileFound?.Invoke(this, args);
-            Stoped = args.Stop ? args.Stop : Stoped;
-        }
-
-        /// <summary>
-        /// Invoke methods from FilteredDirectoryFound event.
-        /// </summary>
-        /// <param name="args"></param>
-        protected virtual void OnFilteredDirectoryFound(FileSystemEventArgs args)
-        {
-            FilteredDirectoryFound?.Invoke(this, args);
-            Stoped = args.Stop ? args.Stop : Stoped;
-        }
-
-        /// <summary>
-        /// Returns everysingle directory and filtered files from sprecified directory.
+        /// Returns every single directory and filtered files from sprecified directory.
         /// </summary>
         /// <param name="directory">Provided directory.</param>
         /// <returns>FileInfo of each file and directory.</returns>
-        private async IAsyncEnumerable<FileSystemInfo> GetAllFromCurrentDirectory(DirectoryInfo directory)
+        private async IAsyncEnumerable<IFileSystemInfo> GetAllFromCurrentDirectory(IFileSystemInfo directory)
         {
-            foreach (var directoryFromDirectory in directory.EnumerateDirectories())
+            foreach (var directoryName in _fileSystem.Directory.EnumerateDirectories(directory.FullName))
             {
-                var eventArgs = new FileSystemEventArgs
+                var directoryInfo = _fileSystem.DirectoryInfo.FromDirectoryName(directoryName);
+                var results = ProcessFileSystemObject(directoryInfo);
+                if (!results.Exclude)
                 {
-                    Info = directoryFromDirectory
-                };
-                OnDirectoryFound(eventArgs);
-                if (eventArgs.Exclude == false && filter(directoryFromDirectory))
-                {
-                    OnFilteredDirectoryFound(eventArgs);
-                    if (eventArgs.Exclude == false)
+                    await foreach (var file in GetAllFromCurrentDirectory(directoryInfo))
                     {
-                        await foreach (var file in GetAllFromCurrentDirectory(directoryFromDirectory))
-                        {
-                            yield return file;
-                        }
-
-                        await foreach (var file in GetFilesFromCurrentDirectory(directoryFromDirectory))
-                        {
-                            yield return file;
-                        }
+                        yield return file;
                     }
-                }
-            }
-        }
 
-        /// <summary>
-        /// Returns files from current directory.
-        /// </summary>
-        /// <param name="directoryInfo">Current direcotry.</param>
-        /// <returns>Files from directory.</returns>
-        private async IAsyncEnumerable<FileInfo> GetFilesFromCurrentDirectory(DirectoryInfo directoryInfo)
-        {
-            var filesTask = await Task.Run(directoryInfo.EnumerateFiles);
-            foreach (var file in filesTask)
-            {
-                var eventArgs = new FileSystemEventArgs
-                {
-                    Info = file
-                };
-                OnFileFound(eventArgs);
-                if (filter(file) && eventArgs.Exclude == false)
-                {
-                    OnFilteredFileFound(eventArgs);
-                    if (eventArgs.Exclude == false)
+                    foreach (var file in GetFilesFromCurrentDirectory(directoryInfo))
                     {
                         yield return file;
                     }
                 }
             }
+
+            if (directory.FullName.Equals(@"C:\"))
+            {
+                foreach (var file in ProcessRootDirectory(directory))
+                {
+                    yield return file;
+                }
+            }
         }
 
-        /// <summary>
-        /// To get name with directories started from provided fileSystem.
-        /// </summary>
-        /// <param name="file">File.</param>
-        /// <returns>Correctly cut name.</returns>
-        private string GetNameWithoutLongPath(FileSystemInfo file)
+        private IEnumerable<IFileSystemInfo> ProcessRootDirectory(IFileSystemInfo directory)
         {
-            return file.FullName.Replace(fileSystem.FullName, string.Empty);
+            var results = ProcessFileSystemObject(directory);
+            if (!results.Exclude)
+            {
+                foreach (var file in GetFilesFromCurrentDirectory(directory))
+                {
+                    yield return file;
+                }
+            }
         }
 
-        private void CheckInputOfConstructor(DirectoryInfo fileSystem)
+        private void OnSearchStarted(IFileSystemInfo info)
         {
-            if (fileSystem is null)
+            Stoped = false;
+            SearchStarted?.Invoke(this, info);
+        }
+
+        private void OnSearchEnded(IFileSystemInfo info)
+        {
+            Stoped = true;
+            SearchEnded?.Invoke(this, info);
+        }
+
+        private FileSystemEventArgs ProcessFileSystemObject(IFileSystemInfo info)
+        {
+            var isDirecotry = info.Attributes.HasFlag(FileAttributes.Directory);
+            var isIgnored = isDirecotry ? false : !_filter(info);
+            var args = new FileSystemEventArgs
             {
-                throw new NullReferenceException(nameof(fileSystem));
-            }
-            else if (Directory.Exists(fileSystem.FullName) == false)
+                Info = info
+            };
+
+            var handler = isDirecotry
+                ? isIgnored
+                    ? DirectoryFound
+                    : FilteredDirectoryFound
+                : isIgnored
+                    ? FileFound
+                    : FilteredFileFound;
+
+            handler?.Invoke(this, args);
+            args.Exclude = args.Exclude || isIgnored;
+            Stoped = args.Stop;
+            return args;
+        }
+
+        private IEnumerable<IFileSystemInfo> GetFilesFromCurrentDirectory(IFileSystemInfo directoryInfo)
+        {
+            foreach (var fileName in _fileSystem.Directory.EnumerateFiles(directoryInfo.FullName))
             {
-                throw new DirectoryNotFoundException();
+                var fileInfo = _fileSystem.FileInfo.FromFileName(fileName);
+                var result = ProcessFileSystemObject(fileInfo);
+                if (!result.Exclude)
+                {
+                    yield return fileInfo;
+                }
             }
+        }
+
+        private string GetNameWithoutLongPath(IFileSystemInfo file)
+        {
+            return file.FullName.Replace(_initialPath, string.Empty);
         }
     }
 }

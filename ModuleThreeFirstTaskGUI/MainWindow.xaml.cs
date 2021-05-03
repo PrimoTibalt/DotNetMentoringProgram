@@ -20,7 +20,7 @@ namespace ModuleThreeFirstTaskGUI
     /// </summary>
     public partial class MainWindow : Window
     {
-        private SearchRunner runner;
+        private SearchRunner _runner;
 
         /// <summary>
         /// Constructor of WPF page.
@@ -32,7 +32,7 @@ namespace ModuleThreeFirstTaskGUI
 
         private void SearchBtn_Click(object sender, RoutedEventArgs e)
         {
-            var task = Task.Run(runner.RunSearch);
+            var task = Task.Run(_runner.RunSearch);
             SearchBtn.IsEnabled = false;
             ApplyBtn.IsEnabled = false;
             ApplyFilterBtn.IsEnabled = false;
@@ -56,13 +56,14 @@ namespace ModuleThreeFirstTaskGUI
         {
             ApplyFilterBtn.Visibility = Visibility.Visible;
             SearchBtn.Visibility = Visibility.Visible;
-            runner = new SearchRunner(this);
-            FilePathLbl.Content = $"Current path: {runner.AddFilePath(PathTxt.Text)}";
+            _runner = new SearchRunner(this);
+            FilePathLbl.Content = $"Current path: {_runner.AddFilePath(PathTxt.Text)}";
         }
 
         private void ApplyFilterBtn_Click(object sender, RoutedEventArgs e)
         {
-            runner.SetFilterForName((file) => Dispatcher.Invoke(() => file.Name.Contains(FilterContainsTxt.Text)));
+            var upperFilterText = FilterContainsTxt.Text.ToUpperInvariant();
+            _runner.SetFilterForName((file) => Dispatcher.Invoke(() => file.Name.ToUpperInvariant().Contains(upperFilterText)));
         }
     }
 }
