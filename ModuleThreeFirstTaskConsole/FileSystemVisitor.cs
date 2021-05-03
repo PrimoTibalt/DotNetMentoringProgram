@@ -82,12 +82,11 @@ namespace ModuleThreeFirstTaskConsole
             OnSearchStarted(directory);
             await foreach (var info in GetAllFromCurrentDirectory(directory))
             {
+                yield return GetNameWithoutLongPath(info);
                 if (Stoped)
                 {
                     break;
                 }
-
-                yield return GetNameWithoutLongPath(info);
             }
 
             OnSearchEnded(directory);
