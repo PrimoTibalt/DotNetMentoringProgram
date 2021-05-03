@@ -18,9 +18,8 @@ namespace ModuleThreeSecondTaskTests
         /// <summary>
         /// Checkes do the visitor returns all files from provided filesystem.
         /// </summary>
-        /// <returns>A <see cref="Task"/> representing the result of the asynchronous operation.</returns>
         [Fact]
-        public async Task Method_AllFiles_Returned()
+        public void Method_AllFiles_Returned()
         {
             var paths = new List<string>
             {
@@ -84,10 +83,10 @@ namespace ModuleThreeSecondTaskTests
             });
             string initialPath = @"c:\";
             Func<IFileSystemInfo, bool> predicate = (info) => true;
-            var visitor = new FileSystemVisitor(fileSystem, predicate, initialPath);
+            var visitor = new FileSystemVisitor(fileSystem, predicate);
             var list = new List<string>();
 
-            await foreach (var name in visitor.Search())
+            foreach (var name in visitor.Search(initialPath))
             {
                 list.Add(name);
             }
@@ -98,9 +97,8 @@ namespace ModuleThreeSecondTaskTests
         /// <summary>
         /// Checkes do the visitor returns all files that are filtered.
         /// </summary>
-        /// <returns>A <see cref="Task"/> representing the result of the asynchronous operation.</returns>
         [Fact]
-        public async Task GroupOfMethods_FilteredFiles_Returned()
+        public void GroupOfMethods_FilteredFiles_Returned()
         {
             var paths = new List<string>
             {
@@ -141,10 +139,10 @@ namespace ModuleThreeSecondTaskTests
             });
             string initialPath = @"c:\";
             Func<IFileSystemInfo, bool> predicate = (info) => info.Extension == ".gif";
-            var visitor = new FileSystemVisitor(fileSystem, predicate, initialPath);
+            var visitor = new FileSystemVisitor(fileSystem, predicate);
             var list = new List<string>();
 
-            await foreach (var name in visitor.Search())
+            foreach (var name in visitor.Search(initialPath))
             {
                 list.Add(name);
             }
@@ -155,9 +153,8 @@ namespace ModuleThreeSecondTaskTests
         /// <summary>
         /// Checkes do the visitor return only filtered records.
         /// </summary>
-        /// <returns>A <see cref="Task"/> representing the result of the asynchronous operation.</returns>
         [Fact]
-        public async Task GroupOfMethods_OnlyFilteredFiles_Returned()
+        public void GroupOfMethods_OnlyFilteredFiles_Returned()
         {
             var paths = new List<string>
             {
@@ -198,10 +195,10 @@ namespace ModuleThreeSecondTaskTests
             });
             string initialPath = @"c:\";
             Func<IFileSystemInfo, bool> predicate = (info) => info.Extension == ".gif";
-            var visitor = new FileSystemVisitor(fileSystem, predicate, initialPath);
+            var visitor = new FileSystemVisitor(fileSystem, predicate);
             var list = new List<string>();
 
-            await foreach (var name in visitor.Search())
+            foreach (var name in visitor.Search(initialPath))
             {
                 list.Add(name);
             }
@@ -212,9 +209,8 @@ namespace ModuleThreeSecondTaskTests
         /// <summary>
         /// Checkes do the visitor stop if filtered file found and Stop flag is set.
         /// </summary>
-        /// <returns>A <see cref="Task"/> representing the result of the asynchronous operation.</returns>
         [Fact]
-        public async Task GroupOfMethods_Stoped_Returned()
+        public void GroupOfMethods_Stoped_Returned()
         {
             var paths = new List<string>
             {
@@ -255,11 +251,11 @@ namespace ModuleThreeSecondTaskTests
             });
             string initialPath = @"c:\";
             Func<IFileSystemInfo, bool> predicate = (info) => info.Extension == ".gif";
-            var visitor = new FileSystemVisitor(fileSystem, predicate, initialPath);
-            visitor.FilteredFileFound += (senger, args) => args.Stop = true;
+            var visitor = new FileSystemVisitor(fileSystem, predicate);
+            visitor.FilteredFileFound += (args) => args.Stop = true;
             var list = new List<string>();
 
-            await foreach (var name in visitor.Search())
+            foreach (var name in visitor.Search(initialPath))
             {
                 list.Add(name);
             }
@@ -270,9 +266,8 @@ namespace ModuleThreeSecondTaskTests
         /// <summary>
         /// Checkes do the visitor returned path that fits filtering.
         /// </summary>
-        /// <returns>A <see cref="Task"/> representing the result of the asynchronous operation.</returns>
         [Fact]
-        public async Task GroupOfMethods_ReturnedRightFileOnStop_Returned()
+        public void GroupOfMethods_ReturnedRightFileOnStop_Returned()
         {
             var paths = new List<string>
             {
@@ -314,11 +309,11 @@ namespace ModuleThreeSecondTaskTests
             string initialPath = @"c:\";
             string extension = ".gif";
             Func<IFileSystemInfo, bool> predicate = (info) => info.Extension == extension;
-            var visitor = new FileSystemVisitor(fileSystem, predicate, initialPath);
-            visitor.FilteredFileFound += (senger, args) => args.Stop = true;
+            var visitor = new FileSystemVisitor(fileSystem, predicate);
+            visitor.FilteredFileFound += (args) => args.Stop = true;
             var list = new List<string>();
 
-            await foreach (var name in visitor.Search())
+            foreach (var name in visitor.Search(initialPath))
             {
                 list.Add(name);
             }
@@ -333,14 +328,12 @@ namespace ModuleThreeSecondTaskTests
         [Fact]
         public void Method_ErrorOnNullInFileSystem_Throws()
         {
-            var initialPath = @"c:\";
-            Assert.Throws<ArgumentNullException>(() => new FileSystemVisitor(null, (info) => true, initialPath));
+            Assert.Throws<ArgumentNullException>(() => new FileSystemVisitor(null, (info) => true));
         }
 
         /// <summary>
         /// Checkes do the visitor throw DirectoryNotFoundException if initialpath doesn't exist.
         /// </summary>
-        /// <returns>A <see cref="Task"/> representing the result of the asynchronous operation.</returns>
         [Fact]
         public void Method_OnWrongPath_Throws()
         {
@@ -361,15 +354,16 @@ namespace ModuleThreeSecondTaskTests
             string initialPath = @"c:\monkey";
             string extension = ".gif";
             Func<IFileSystemInfo, bool> predicate = (info) => info.Extension == extension;
-            Assert.Throws<DirectoryNotFoundException>(() => new FileSystemVisitor(fileSystem, predicate, initialPath));
+            var visitor = new FileSystemVisitor(fileSystem, predicate);
+
+            Assert.Throws<DirectoryNotFoundException>(() => visitor.Search(initialPath));
         }
 
         /// <summary>
         /// Checkes do the visitor return files from long initialpath.
         /// </summary>
-        /// <returns>A <see cref="Task"/> representing the result of the asynchronous operation.</returns>
         [Fact]
-        public async Task GroupOfMethods_FilesReturnedFromLongPath_Returned()
+        public void GroupOfMethods_FilesReturnedFromLongPath_Returned()
         {
             var paths = new List<string>
             {
@@ -411,10 +405,10 @@ namespace ModuleThreeSecondTaskTests
             string initialPath = @"c:\files\mimik\spider\man\tongue";
             var shortPathsFiltered = paths.Where(path => path.Contains(initialPath)).Select((path, _) => path.Replace(initialPath, string.Empty)).ToList();
             Func<IFileSystemInfo, bool> predicate = (info) => true;
-            var visitor = new FileSystemVisitor(fileSystem, predicate, initialPath);
+            var visitor = new FileSystemVisitor(fileSystem, predicate);
             var list = new List<string>();
 
-            await foreach (var name in visitor.Search())
+            foreach (var name in visitor.Search(initialPath))
             {
                 list.Add(name);
             }
@@ -425,9 +419,8 @@ namespace ModuleThreeSecondTaskTests
         /// <summary>
         /// Checkes do the visitor return files only if they passed validation and not excluded.
         /// </summary>
-        /// <returns>A <see cref="Task"/> representing the result of the asynchronous operation.</returns>
         [Fact]
-        public async Task Class_FilesFilteredAndNotExcluded_Returned()
+        public void Class_FilesFilteredAndNotExcluded_Returned()
         {
             var paths = new List<string>
             {
@@ -471,11 +464,11 @@ namespace ModuleThreeSecondTaskTests
             string directory = "mimik";
             var shortPathsFiltered = paths.Where(path => path.Contains(initialPath) && path.Contains(directory) && path.Contains(extension)).Select((path, _) => path.Replace(initialPath, string.Empty)).ToList();
             Func<IFileSystemInfo, bool> predicate = (info) => info.Extension == extension;
-            var visitor = new FileSystemVisitor(fileSystem, predicate, initialPath);
-            visitor.FilteredFileFound += (sender, args) => args.Exclude = !args.Info.FullName.Contains(directory);
+            var visitor = new FileSystemVisitor(fileSystem, predicate);
+            visitor.FilteredFileFound += (args) => args.Exclude = !args.Info.FullName.Contains(directory);
             var list = new List<string>();
 
-            await foreach (var name in visitor.Search())
+            foreach (var name in visitor.Search(initialPath))
             {
                 list.Add(name);
             }
