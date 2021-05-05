@@ -53,9 +53,9 @@ namespace ModuleThreeSecondTaskTests
             };
             var paths = files.Keys.ToList();
             var fileSystem = new MockFileSystem(files);
-            string initialPath = @"c:\";
-            Func<IFileSystemInfo, bool> predicate = (info) => true;
+            var initialPath = @"c:\";
             var list = new List<string>();
+            Func<IFileSystemInfo, bool> predicate = (info) => true;
 
             var visitor = new FileSystemVisitor(fileSystem, predicate);
             foreach (var name in visitor.Search(initialPath))
@@ -93,9 +93,9 @@ namespace ModuleThreeSecondTaskTests
             };
             var paths = files.Keys.ToList();
             var fileSystem = new MockFileSystem(files);
-            string initialPath = @"c:\";
-            Func<IFileSystemInfo, bool> predicate = (info) => info.Extension == ".gif";
+            var initialPath = @"c:\";
             var list = new List<string>();
+            Func<IFileSystemInfo, bool> predicate = (info) => info.Extension == ".gif";
 
             var visitor = new FileSystemVisitor(fileSystem, predicate);
             foreach (var name in visitor.Search(initialPath))
@@ -133,9 +133,9 @@ namespace ModuleThreeSecondTaskTests
             };
             var paths = files.Keys.ToList();
             var fileSystem = new MockFileSystem(files);
-            string initialPath = @"c:\";
-            Func<IFileSystemInfo, bool> predicate = (info) => info.Extension == ".gif";
+            var initialPath = @"c:\";
             var list = new List<string>();
+            Func<IFileSystemInfo, bool> predicate = (info) => info.Extension == ".gif";
 
             var visitor = new FileSystemVisitor(fileSystem, predicate);
             foreach (var name in visitor.Search(initialPath))
@@ -173,9 +173,9 @@ namespace ModuleThreeSecondTaskTests
             };
             var paths = files.Keys.ToList();
             var fileSystem = new MockFileSystem(files);
-            string initialPath = @"c:\";
-            Func<IFileSystemInfo, bool> predicate = (info) => info.Extension == ".gif";
+            var initialPath = @"c:\";
             var list = new List<string>();
+            Func<IFileSystemInfo, bool> predicate = (info) => info.Extension == ".gif";
 
             var visitor = new FileSystemVisitor(fileSystem, predicate);
             visitor.FilteredFileFound += (args) => args.Stop = true;
@@ -214,10 +214,10 @@ namespace ModuleThreeSecondTaskTests
             };
             var paths = files.Keys.ToList();
             var fileSystem = new MockFileSystem(files);
-            string initialPath = @"c:\";
-            string extension = ".gif";
-            Func<IFileSystemInfo, bool> predicate = (info) => info.Extension == extension;
+            var initialPath = @"c:\";
+            var extension = ".gif";
             var list = new List<string>();
+            Func<IFileSystemInfo, bool> predicate = (info) => info.Extension == extension;
 
             var visitor = new FileSystemVisitor(fileSystem, predicate);
             visitor.FilteredFileFound += (args) => args.Stop = true;
@@ -254,10 +254,10 @@ namespace ModuleThreeSecondTaskTests
             };
             var paths = files.Keys.ToList();
             var fileSystem = new MockFileSystem(files);
-            string initialPath = @"c:\monkey";
-            string extension = ".gif";
+            var initialPath = @"c:\monkey";
+            var extension = ".gif";
+            var list = new List<string>();
             Func<IFileSystemInfo, bool> predicate = (info) => info.Extension == extension;
-            List<string> list = new List<string>();
 
             var visitor = new FileSystemVisitor(fileSystem, predicate);
 
@@ -291,10 +291,10 @@ namespace ModuleThreeSecondTaskTests
             };
             var paths = files.Keys.ToList();
             var fileSystem = new MockFileSystem(files);
-            string initialPath = @"c:\files\mimik\spider\man\tongue";
+            var initialPath = @"c:\files\mimik\spider\man\tongue";
             var shortPathsFiltered = paths.Where(path => path.Contains(initialPath)).Select((path, _) => path.Replace(initialPath, string.Empty)).ToList();
-            Func<IFileSystemInfo, bool> predicate = (info) => true;
             var list = new List<string>();
+            Func<IFileSystemInfo, bool> predicate = (info) => true;
 
             var visitor = new FileSystemVisitor(fileSystem, predicate);
             foreach (var name in visitor.Search(initialPath))
@@ -332,12 +332,12 @@ namespace ModuleThreeSecondTaskTests
             };
             var paths = files.Keys.ToList();
             var fileSystem = new MockFileSystem(files);
-            string initialPath = @"c:\files";
-            string extension = ".txt";
-            string directory = "mimik";
+            var initialPath = @"c:\files";
+            var extension = ".txt";
+            var directory = "mimik";
             var shortPathsFiltered = paths.Where(path => path.Contains(initialPath) && path.Contains(directory) && path.Contains(extension)).Select((path, _) => path.Replace(initialPath, string.Empty)).ToList();
-            Func<IFileSystemInfo, bool> predicate = (info) => info.Extension == extension;
             var list = new List<string>();
+            Func<IFileSystemInfo, bool> predicate = (info) => info.Extension == extension;
 
             var visitor = new FileSystemVisitor(fileSystem, predicate);
             visitor.FilteredFileFound += (args) => args.Exclude = !args.Info.FullName.Contains(directory);
@@ -376,11 +376,11 @@ namespace ModuleThreeSecondTaskTests
             };
             var paths = files.Keys.ToList();
             var fileSystem = new MockFileSystem(files);
-            string initialPath = @"c:\files";
-            string extension = ".txt";
-            Func<IFileSystemInfo, bool> predicate = (info) => info.Extension == extension;
+            var initialPath = @"c:\files";
+            var extension = ".txt";
             var list = new List<string>();
             var counter = 0;
+            Func<IFileSystemInfo, bool> predicate = (info) => info.Extension == extension;
 
             var visitor = new FileSystemVisitor(fileSystem, predicate);
             visitor.FilteredFileFound += (args) => counter++;
