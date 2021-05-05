@@ -83,9 +83,9 @@ namespace ModuleThreeSecondTaskTests
             });
             string initialPath = @"c:\";
             Func<IFileSystemInfo, bool> predicate = (info) => true;
-            var visitor = new FileSystemVisitor(fileSystem, predicate);
             var list = new List<string>();
 
+            var visitor = new FileSystemVisitor(fileSystem, predicate);
             foreach (var name in visitor.Search(initialPath))
             {
                 list.Add(name);
@@ -139,9 +139,9 @@ namespace ModuleThreeSecondTaskTests
             });
             string initialPath = @"c:\";
             Func<IFileSystemInfo, bool> predicate = (info) => info.Extension == ".gif";
-            var visitor = new FileSystemVisitor(fileSystem, predicate);
             var list = new List<string>();
 
+            var visitor = new FileSystemVisitor(fileSystem, predicate);
             foreach (var name in visitor.Search(initialPath))
             {
                 list.Add(name);
@@ -195,9 +195,9 @@ namespace ModuleThreeSecondTaskTests
             });
             string initialPath = @"c:\";
             Func<IFileSystemInfo, bool> predicate = (info) => info.Extension == ".gif";
-            var visitor = new FileSystemVisitor(fileSystem, predicate);
             var list = new List<string>();
 
+            var visitor = new FileSystemVisitor(fileSystem, predicate);
             foreach (var name in visitor.Search(initialPath))
             {
                 list.Add(name);
@@ -210,7 +210,7 @@ namespace ModuleThreeSecondTaskTests
         /// Checkes do the visitor stop if filtered file found and Stop flag is set.
         /// </summary>
         [Fact]
-        public void GroupOfMethods_Stoped_Returned()
+        public void GroupOfMethods_WithStopFlagOnFilterFileFound_ReturnedOneFile()
         {
             var paths = new List<string>
             {
@@ -251,10 +251,10 @@ namespace ModuleThreeSecondTaskTests
             });
             string initialPath = @"c:\";
             Func<IFileSystemInfo, bool> predicate = (info) => info.Extension == ".gif";
-            var visitor = new FileSystemVisitor(fileSystem, predicate);
-            visitor.FilteredFileFound += (args) => args.Stop = true;
             var list = new List<string>();
 
+            var visitor = new FileSystemVisitor(fileSystem, predicate);
+            visitor.FilteredFileFound += (args) => args.Stop = true;
             foreach (var name in visitor.Search(initialPath))
             {
                 list.Add(name);
@@ -267,7 +267,7 @@ namespace ModuleThreeSecondTaskTests
         /// Checkes do the visitor returned path that fits filtering.
         /// </summary>
         [Fact]
-        public void GroupOfMethods_ReturnedRightFileOnStop_Returned()
+        public void GroupOfMethods_WithStopFlagOnFilterFileFound_ReturnedFileFitsCondition()
         {
             var paths = new List<string>
             {
@@ -309,10 +309,10 @@ namespace ModuleThreeSecondTaskTests
             string initialPath = @"c:\";
             string extension = ".gif";
             Func<IFileSystemInfo, bool> predicate = (info) => info.Extension == extension;
-            var visitor = new FileSystemVisitor(fileSystem, predicate);
-            visitor.FilteredFileFound += (args) => args.Stop = true;
             var list = new List<string>();
 
+            var visitor = new FileSystemVisitor(fileSystem, predicate);
+            visitor.FilteredFileFound += (args) => args.Stop = true;
             foreach (var name in visitor.Search(initialPath))
             {
                 list.Add(name);
@@ -326,7 +326,7 @@ namespace ModuleThreeSecondTaskTests
         /// </summary>
         /// <returns>A <see cref="Task"/> representing the result of the asynchronous operation.</returns>
         [Fact]
-        public void Method_ErrorOnNullInFileSystem_Throws()
+        public void Method_NullInFileSystem_Throws()
         {
             Assert.Throws<ArgumentNullException>(() => new FileSystemVisitor(null, (info) => true));
         }
@@ -335,7 +335,7 @@ namespace ModuleThreeSecondTaskTests
         /// Checkes do the visitor throw DirectoryNotFoundException if initialpath doesn't exist.
         /// </summary>
         [Fact]
-        public void Method_OnWrongPath_Throws()
+        public void Method_WrongInitialPath_Throws()
         {
             var paths = new List<string>
             {
@@ -354,8 +354,9 @@ namespace ModuleThreeSecondTaskTests
             string initialPath = @"c:\monkey";
             string extension = ".gif";
             Func<IFileSystemInfo, bool> predicate = (info) => info.Extension == extension;
-            var visitor = new FileSystemVisitor(fileSystem, predicate);
             List<string> list = new List<string>();
+
+            var visitor = new FileSystemVisitor(fileSystem, predicate);
 
             Assert.Throws<DirectoryNotFoundException>(() => visitor.Search(initialPath).ToList());
         }
@@ -364,7 +365,7 @@ namespace ModuleThreeSecondTaskTests
         /// Checkes do the visitor return files from long initialpath.
         /// </summary>
         [Fact]
-        public void GroupOfMethods_FilesReturnedFromLongPath_Returned()
+        public void GroupOfMethods_LongInitialPath_ReturnedFilesFromThePath()
         {
             var paths = new List<string>
             {
@@ -406,9 +407,9 @@ namespace ModuleThreeSecondTaskTests
             string initialPath = @"c:\files\mimik\spider\man\tongue";
             var shortPathsFiltered = paths.Where(path => path.Contains(initialPath)).Select((path, _) => path.Replace(initialPath, string.Empty)).ToList();
             Func<IFileSystemInfo, bool> predicate = (info) => true;
-            var visitor = new FileSystemVisitor(fileSystem, predicate);
             var list = new List<string>();
 
+            var visitor = new FileSystemVisitor(fileSystem, predicate);
             foreach (var name in visitor.Search(initialPath))
             {
                 list.Add(name);
@@ -421,7 +422,7 @@ namespace ModuleThreeSecondTaskTests
         /// Checkes do the visitor return files only if they passed validation and not excluded.
         /// </summary>
         [Fact]
-        public void Class_FilesFilteredAndNotExcluded_Returned()
+        public void Class_FilterAndExcludeConditionsProvided_ReturnedOnlyFilteredAndNotExcludedFiles()
         {
             var paths = new List<string>
             {
@@ -465,16 +466,75 @@ namespace ModuleThreeSecondTaskTests
             string directory = "mimik";
             var shortPathsFiltered = paths.Where(path => path.Contains(initialPath) && path.Contains(directory) && path.Contains(extension)).Select((path, _) => path.Replace(initialPath, string.Empty)).ToList();
             Func<IFileSystemInfo, bool> predicate = (info) => info.Extension == extension;
-            var visitor = new FileSystemVisitor(fileSystem, predicate);
-            visitor.FilteredFileFound += (args) => args.Exclude = !args.Info.FullName.Contains(directory);
             var list = new List<string>();
 
+            var visitor = new FileSystemVisitor(fileSystem, predicate);
+            visitor.FilteredFileFound += (args) => args.Exclude = !args.Info.FullName.Contains(directory);
             foreach (var name in visitor.Search(initialPath))
             {
                 list.Add(name);
             }
 
             Assert.True(list.TrueForAll(file => shortPathsFiltered.IndexOf(file) != -1) && list.Count == shortPathsFiltered.Count);
+        }
+
+        /// <summary>
+        /// Checkes do the visitor return files only if they passed validation and not excluded.
+        /// </summary>
+        [Fact]
+        public void Class_OnFilteredFileFoundCounter_CountsRightTimes()
+        {
+            var paths = new List<string>
+            {
+                @"c:\myfile.txt",
+                @"c:\demo\jQuery.js",
+                @"c:\demo\image.gif",
+                @"c:\files\home.txt",
+                @"c:\files\jQuery.js",
+                @"c:\files\sun\image.gif",
+                @"c:\files\sun\aaawifihsdifhish.txt",
+                @"c:\files\zangetsu\motherland.js",
+                @"c:\files\zangetsu\moon\neiborhood.gif",
+                @"c:\files\stand\here\comrad\sunday.txt",
+                @"c:\files\mimik\spider\man\tongue\control\panel\MilesMorales.js",
+                @"c:\files\mimik\spider\man\image.gif",
+                @"c:\files\mimik\spider\man\tongue\control\Gokuden.txt",
+                @"c:\files\mimik\spider\man\tongue\rainbow.js",
+                @"c:\files\mimik\spider\man\tongue\colors\pink.gif",
+                @"c:\files\mirror\clone.txt",
+            };
+            var fileSystem = new MockFileSystem(new Dictionary<string, MockFileData>
+            {
+                { paths[0], new MockFileData("Testing is meh.") },
+                { paths[1], new MockFileData("some js") },
+                { paths[2], new MockFileData(new byte[] { 0x12, 0x34, 0x56, 0xd2 }) },
+                { paths[3], new MockFileData("Testing is meh.") },
+                { paths[4], new MockFileData("some js") },
+                { paths[5], new MockFileData(new byte[] { 0x12, 0x34, 0x56, 0xd2 }) },
+                { paths[6], new MockFileData("Testing is meh.") },
+                { paths[7], new MockFileData("some js") },
+                { paths[8], new MockFileData(new byte[] { 0x12, 0x34, 0x56, 0xd2 }) },
+                { paths[9], new MockFileData("Testing is meh.") },
+                { paths[10], new MockFileData("some js") },
+                { paths[11], new MockFileData(new byte[] { 0x12, 0x34, 0x56, 0xd2 }) },
+                { paths[12], new MockFileData("Testing is meh.") },
+                { paths[13], new MockFileData("some js") },
+                { paths[14], new MockFileData(new byte[] { 0x12, 0x34, 0x56, 0xd2 }) },
+            });
+            string initialPath = @"c:\files";
+            string extension = ".txt";
+            Func<IFileSystemInfo, bool> predicate = (info) => info.Extension == extension;
+            var list = new List<string>();
+            var counter = 0;
+
+            var visitor = new FileSystemVisitor(fileSystem, predicate);
+            visitor.FilteredFileFound += (args) => counter++;
+            foreach (var name in visitor.Search(initialPath))
+            {
+                list.Add(name);
+            }
+
+            Assert.Equal(list.Count, counter);
         }
     }
 }
