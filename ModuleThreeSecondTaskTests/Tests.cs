@@ -355,8 +355,9 @@ namespace ModuleThreeSecondTaskTests
             string extension = ".gif";
             Func<IFileSystemInfo, bool> predicate = (info) => info.Extension == extension;
             var visitor = new FileSystemVisitor(fileSystem, predicate);
+            List<string> list = new List<string>();
 
-            Assert.Throws<DirectoryNotFoundException>(() => visitor.Search(initialPath));
+            Assert.Throws<DirectoryNotFoundException>(() => visitor.Search(initialPath).ToList());
         }
 
         /// <summary>
