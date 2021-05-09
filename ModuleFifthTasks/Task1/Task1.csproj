@@ -2,7 +2,6 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
-    <CodeAnalysisRuleset>..\root.ruleset</CodeAnalysisRuleset>
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
   </PropertyGroup>
 

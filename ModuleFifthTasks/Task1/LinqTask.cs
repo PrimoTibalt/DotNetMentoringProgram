@@ -89,19 +89,30 @@ namespace Task1
             decimal expensive
         )
         {
-            throw new NotImplementedException();
+            return new List<ValueTuple<decimal, IEnumerable<Product>>>
+            {
+                new ValueTuple<decimal, IEnumerable<Product>>(cheap, new List<Product>(products.Where(product => product.UnitPrice <= cheap))),
+                new ValueTuple<decimal, IEnumerable<Product>>(middle, new List<Product>(products.Where(product => product.UnitPrice <= middle && product.UnitPrice > cheap))),
+                new ValueTuple<decimal, IEnumerable<Product>>(expensive, new List<Product>(products.Where(product => product.UnitPrice > middle))),
+            };
         }
 
         public static IEnumerable<(string city, int averageIncome, int averageIntensity)> Linq9(
             IEnumerable<Customer> customers
         )
         {
-            throw new NotImplementedException();
+            return customers.GroupBy(customer => customer.City).Select(category =>
+            {
+                return new ValueTuple<string, int, int>(
+                    category.Key,
+                    Convert.ToInt32(customers.Where(customer => customer.City == category.Key).Average(customer => customer.Orders.Any() ? customer.Orders.Sum(order => order.Total) : 0)),
+                    (int)customers.Where(customer => customer.City == category.Key).Average(customer => customer.Orders.Count()));
+            });
         }
 
         public static string Linq10(IEnumerable<Supplier> suppliers)
         {
-            throw new NotImplementedException();
+            return string.Join(string.Empty, suppliers.OrderBy(supplier => supplier.Country.Length).ThenBy(supplier => supplier.Country).GroupBy(supplier => supplier.Country).Select(supplier => supplier.Key));
         }
     }
 }
