@@ -11,7 +11,7 @@ namespace Task1
             var result = Console.ReadLine();
             var words = result.Trim().Split(' ').ToList();
             words.RemoveAll(item => string.IsNullOrWhiteSpace(item));
-            if (words.Count < 1 || words.TrueForAll(item => string.IsNullOrWhiteSpace(item)))
+            if (words.Count < 1)
             {
                 Console.WriteLine("No arguments were provided. Try again...");
                 return;
