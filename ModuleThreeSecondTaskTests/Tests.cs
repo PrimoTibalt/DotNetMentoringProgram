@@ -21,36 +21,7 @@ namespace ModuleThreeSecondTaskTests
         [Fact]
         public void Method_AllFiles_Returned()
         {
-            var files = new Dictionary<string, MockFileData>
-            {
-                { @"c:\myfile.txt", new MockFileData("Testing is meh.") },
-                { @"c:\demo\jQuery.js", new MockFileData("some js") },
-                { @"c:\demo\image.gif", new MockFileData(new byte[] { 0x12, 0x34, 0x56, 0xd2 }) },
-                { @"c:\files\home.txt", new MockFileData("Testing is meh.") },
-                { @"c:\files\jQuery.js", new MockFileData("some js") },
-                { @"c:\files\sun\image.gif", new MockFileData(new byte[] { 0x12, 0x34, 0x56, 0xd2 }) },
-                { @"c:\files\sun\aaawifihsdifhish.txt", new MockFileData("Testing is meh.") },
-                { @"c:\files\zangetsu\motherland.js", new MockFileData("some js") },
-                { @"c:\files\zangetsu\moon\neiborhood.gif", new MockFileData(new byte[] { 0x12, 0x34, 0x56, 0xd2 }) },
-                { @"c:\files\stand\here\comrad\sunday.txt", new MockFileData("Testing is meh.") },
-                { @"c:\files\mimik\spider\man\tongue\control\panel\MilesMorales.js", new MockFileData("some js") },
-                { @"c:\files\mimik\spider\man\image.gif", new MockFileData(new byte[] { 0x12, 0x34, 0x56, 0xd2 }) },
-                { @"c:\files\mimik\spider\man\tongue\control\Gokuden.txt", new MockFileData("Testing is meh.") },
-                { @"c:\files\mimik\spider\man\tongue\rainbow.js", new MockFileData("some js") },
-                { @"c:\files\mimik\spider\man\tongue\colors\pink.gif", new MockFileData(new byte[] { 0x12, 0x34, 0x56, 0xd2 }) },
-                { @"c:\files\mirror\clone.txt", new MockFileData("Testing is meh.") },
-                { @"c:\dnd\mage.js", new MockFileData("some js") },
-                { @"c:\dnd\warrior.gif", new MockFileData(new byte[] { 0x12, 0x34, 0x56, 0xd2 }) },
-                { @"c:\dnd\bard.txt", new MockFileData("Testing is meh.") },
-                { @"c:\dnd\healer.js", new MockFileData("some js") },
-                { @"c:\demo\darksidewhy.gif", new MockFileData(new byte[] { 0x12, 0x34, 0x56, 0xd2 }) },
-                { @"c:\fate\astolfo.txt", new MockFileData("Testing is meh.") },
-                { @"c:\fate\Emia.js", new MockFileData("some js") },
-                { @"c:\fate\Shiro.gif", new MockFileData(new byte[] { 0x12, 0x34, 0x56, 0xd2 }) },
-                { @"c:\fate\Archer.txt", new MockFileData("Testing is meh.") },
-                { @"c:\fate\Saber.js", new MockFileData("some js") },
-                { @"c:\fate\stay\night\unlimited\blade\works\heavens\feel\apocrif\prototype\tsukihime\moon\princess\arkveit.gif", new MockFileData(new byte[] { 0x12, 0x34, 0x56, 0xd2 }) },
-            };
+            var files = FileSystemDictionaryFactory.CreateLargeFileSystem();
             var paths = files.Keys.ToList();
             var fileSystem = new MockFileSystem(files);
             var initialPath = @"c:\";
@@ -72,25 +43,7 @@ namespace ModuleThreeSecondTaskTests
         [Fact]
         public void GroupOfMethods_FilteredFiles_Returned()
         {
-            var files = new Dictionary<string, MockFileData>
-            {
-                { @"c:\myfile.txt", new MockFileData("Testing is meh.") },
-                { @"c:\demo\jQuery.js", new MockFileData("some js") },
-                { @"c:\demo\image.gif", new MockFileData(new byte[] { 0x12, 0x34, 0x56, 0xd2 }) },
-                { @"c:\files\home.txt", new MockFileData("Testing is meh.") },
-                { @"c:\files\jQuery.js", new MockFileData("some js") },
-                { @"c:\files\sun\image.gif", new MockFileData(new byte[] { 0x12, 0x34, 0x56, 0xd2 }) },
-                { @"c:\files\sun\aaawifihsdifhish.txt", new MockFileData("Testing is meh.") },
-                { @"c:\files\zangetsu\motherland.js", new MockFileData("some js") },
-                { @"c:\files\zangetsu\moon\neiborhood.gif", new MockFileData(new byte[] { 0x12, 0x34, 0x56, 0xd2 }) },
-                { @"c:\files\stand\here\comrad\sunday.txt", new MockFileData("Testing is meh.") },
-                { @"c:\files\mimik\spider\man\tongue\control\panel\MilesMorales.js", new MockFileData("some js") },
-                { @"c:\files\mimik\spider\man\image.gif", new MockFileData(new byte[] { 0x12, 0x34, 0x56, 0xd2 }) },
-                { @"c:\files\mimik\spider\man\tongue\control\Gokuden.txt", new MockFileData("Testing is meh.") },
-                { @"c:\files\mimik\spider\man\tongue\rainbow.js", new MockFileData("some js") },
-                { @"c:\files\mimik\spider\man\tongue\colors\pink.gif", new MockFileData(new byte[] { 0x12, 0x34, 0x56, 0xd2 }) },
-                { @"c:\files\mirror\clone.txt", new MockFileData("Testing is meh.") },
-            };
+            var files = FileSystemDictionaryFactory.CreateMiddleFileSystem();
             var paths = files.Keys.ToList();
             var fileSystem = new MockFileSystem(files);
             var initialPath = @"c:\";
@@ -112,25 +65,7 @@ namespace ModuleThreeSecondTaskTests
         [Fact]
         public void GroupOfMethods_OnlyFilteredFiles_Returned()
         {
-            var files = new Dictionary<string, MockFileData>
-            {
-                { @"c:\myfile.txt", new MockFileData("Testing is meh.") },
-                { @"c:\demo\jQuery.js", new MockFileData("some js") },
-                { @"c:\demo\image.gif", new MockFileData(new byte[] { 0x12, 0x34, 0x56, 0xd2 }) },
-                { @"c:\files\home.txt", new MockFileData("Testing is meh.") },
-                { @"c:\files\jQuery.js", new MockFileData("some js") },
-                { @"c:\files\sun\image.gif", new MockFileData(new byte[] { 0x12, 0x34, 0x56, 0xd2 }) },
-                { @"c:\files\sun\aaawifihsdifhish.txt", new MockFileData("Testing is meh.") },
-                { @"c:\files\zangetsu\motherland.js", new MockFileData("some js") },
-                { @"c:\files\zangetsu\moon\neiborhood.gif", new MockFileData(new byte[] { 0x12, 0x34, 0x56, 0xd2 }) },
-                { @"c:\files\stand\here\comrad\sunday.txt", new MockFileData("Testing is meh.") },
-                { @"c:\files\mimik\spider\man\tongue\control\panel\MilesMorales.js", new MockFileData("some js") },
-                { @"c:\files\mimik\spider\man\image.gif", new MockFileData(new byte[] { 0x12, 0x34, 0x56, 0xd2 }) },
-                { @"c:\files\mimik\spider\man\tongue\control\Gokuden.txt", new MockFileData("Testing is meh.") },
-                { @"c:\files\mimik\spider\man\tongue\rainbow.js", new MockFileData("some js") },
-                { @"c:\files\mimik\spider\man\tongue\colors\pink.gif", new MockFileData(new byte[] { 0x12, 0x34, 0x56, 0xd2 }) },
-                { @"c:\files\mirror\clone.txt", new MockFileData("Testing is meh.") },
-            };
+            var files = FileSystemDictionaryFactory.CreateMiddleFileSystem();
             var paths = files.Keys.ToList();
             var fileSystem = new MockFileSystem(files);
             var initialPath = @"c:\";
@@ -152,25 +87,7 @@ namespace ModuleThreeSecondTaskTests
         [Fact]
         public void GroupOfMethods_WithStopFlagOnFilterFileFound_ReturnedOneFile()
         {
-            var files = new Dictionary<string, MockFileData>
-            {
-                { @"c:\myfile.txt", new MockFileData("Testing is meh.") },
-                { @"c:\demo\jQuery.js", new MockFileData("some js") },
-                { @"c:\demo\image.gif", new MockFileData(new byte[] { 0x12, 0x34, 0x56, 0xd2 }) },
-                { @"c:\files\home.txt", new MockFileData("Testing is meh.") },
-                { @"c:\files\jQuery.js", new MockFileData("some js") },
-                { @"c:\files\sun\image.gif", new MockFileData(new byte[] { 0x12, 0x34, 0x56, 0xd2 }) },
-                { @"c:\files\sun\aaawifihsdifhish.txt", new MockFileData("Testing is meh.") },
-                { @"c:\files\zangetsu\motherland.js", new MockFileData("some js") },
-                { @"c:\files\zangetsu\moon\neiborhood.gif", new MockFileData(new byte[] { 0x12, 0x34, 0x56, 0xd2 }) },
-                { @"c:\files\stand\here\comrad\sunday.txt", new MockFileData("Testing is meh.") },
-                { @"c:\files\mimik\spider\man\tongue\control\panel\MilesMorales.js", new MockFileData("some js") },
-                { @"c:\files\mimik\spider\man\image.gif", new MockFileData(new byte[] { 0x12, 0x34, 0x56, 0xd2 }) },
-                { @"c:\files\mimik\spider\man\tongue\control\Gokuden.txt", new MockFileData("Testing is meh.") },
-                { @"c:\files\mimik\spider\man\tongue\rainbow.js", new MockFileData("some js") },
-                { @"c:\files\mimik\spider\man\tongue\colors\pink.gif", new MockFileData(new byte[] { 0x12, 0x34, 0x56, 0xd2 }) },
-                { @"c:\files\mirror\clone.txt", new MockFileData("Testing is meh.") },
-            };
+            var files = FileSystemDictionaryFactory.CreateMiddleFileSystem();
             var paths = files.Keys.ToList();
             var fileSystem = new MockFileSystem(files);
             var initialPath = @"c:\";
@@ -193,25 +110,7 @@ namespace ModuleThreeSecondTaskTests
         [Fact]
         public void GroupOfMethods_WithStopFlagOnFilterFileFound_ReturnedFileFitsCondition()
         {
-            var files = new Dictionary<string, MockFileData>
-            {
-                { @"c:\myfile.txt", new MockFileData("Testing is meh.") },
-                { @"c:\demo\jQuery.js", new MockFileData("some js") },
-                { @"c:\demo\image.gif", new MockFileData(new byte[] { 0x12, 0x34, 0x56, 0xd2 }) },
-                { @"c:\files\home.txt", new MockFileData("Testing is meh.") },
-                { @"c:\files\jQuery.js", new MockFileData("some js") },
-                { @"c:\files\sun\image.gif", new MockFileData(new byte[] { 0x12, 0x34, 0x56, 0xd2 }) },
-                { @"c:\files\sun\aaawifihsdifhish.txt", new MockFileData("Testing is meh.") },
-                { @"c:\files\zangetsu\motherland.js", new MockFileData("some js") },
-                { @"c:\files\zangetsu\moon\neiborhood.gif", new MockFileData(new byte[] { 0x12, 0x34, 0x56, 0xd2 }) },
-                { @"c:\files\stand\here\comrad\sunday.txt", new MockFileData("Testing is meh.") },
-                { @"c:\files\mimik\spider\man\tongue\control\panel\MilesMorales.js", new MockFileData("some js") },
-                { @"c:\files\mimik\spider\man\image.gif", new MockFileData(new byte[] { 0x12, 0x34, 0x56, 0xd2 }) },
-                { @"c:\files\mimik\spider\man\tongue\control\Gokuden.txt", new MockFileData("Testing is meh.") },
-                { @"c:\files\mimik\spider\man\tongue\rainbow.js", new MockFileData("some js") },
-                { @"c:\files\mimik\spider\man\tongue\colors\pink.gif", new MockFileData(new byte[] { 0x12, 0x34, 0x56, 0xd2 }) },
-                { @"c:\files\mirror\clone.txt", new MockFileData("Testing is meh.") },
-            };
+            var files = FileSystemDictionaryFactory.CreateMiddleFileSystem();
             var paths = files.Keys.ToList();
             var fileSystem = new MockFileSystem(files);
             var initialPath = @"c:\";
@@ -245,13 +144,7 @@ namespace ModuleThreeSecondTaskTests
         [Fact]
         public void Method_WrongInitialPath_Throws()
         {
-            var files = new Dictionary<string, MockFileData>
-            {
-                { @"c:\myfile.txt", new MockFileData("Testing is meh.") },
-                { @"c:\demo\jQuery.js", new MockFileData("some js") },
-                { @"c:\demo\image.gif", new MockFileData(new byte[] { 0x12, 0x34, 0x56, 0xd2 }) },
-                { @"c:\files\home.txt", new MockFileData("Testing is meh.") },
-            };
+            var files = FileSystemDictionaryFactory.CreateSmallFileSystem();
             var paths = files.Keys.ToList();
             var fileSystem = new MockFileSystem(files);
             var initialPath = @"c:\monkey";
@@ -270,25 +163,7 @@ namespace ModuleThreeSecondTaskTests
         [Fact]
         public void GroupOfMethods_LongInitialPath_ReturnedFilesFromThePath()
         {
-            var files = new Dictionary<string, MockFileData>
-            {
-                { @"c:\myfile.txt", new MockFileData("Testing is meh.") },
-                { @"c:\demo\jQuery.js", new MockFileData("some js") },
-                { @"c:\demo\image.gif", new MockFileData(new byte[] { 0x12, 0x34, 0x56, 0xd2 }) },
-                { @"c:\files\home.txt", new MockFileData("Testing is meh.") },
-                { @"c:\files\jQuery.js", new MockFileData("some js") },
-                { @"c:\files\sun\image.gif", new MockFileData(new byte[] { 0x12, 0x34, 0x56, 0xd2 }) },
-                { @"c:\files\sun\aaawifihsdifhish.txt", new MockFileData("Testing is meh.") },
-                { @"c:\files\zangetsu\motherland.js", new MockFileData("some js") },
-                { @"c:\files\zangetsu\moon\neiborhood.gif", new MockFileData(new byte[] { 0x12, 0x34, 0x56, 0xd2 }) },
-                { @"c:\files\stand\here\comrad\sunday.txt", new MockFileData("Testing is meh.") },
-                { @"c:\files\mimik\spider\man\tongue\control\panel\MilesMorales.js", new MockFileData("some js") },
-                { @"c:\files\mimik\spider\man\image.gif", new MockFileData(new byte[] { 0x12, 0x34, 0x56, 0xd2 }) },
-                { @"c:\files\mimik\spider\man\tongue\control\Gokuden.txt", new MockFileData("Testing is meh.") },
-                { @"c:\files\mimik\spider\man\tongue\rainbow.js", new MockFileData("some js") },
-                { @"c:\files\mimik\spider\man\tongue\colors\pink.gif", new MockFileData(new byte[] { 0x12, 0x34, 0x56, 0xd2 }) },
-                { @"c:\files\mirror\clone.txt", new MockFileData("Testing is meh.") },
-            };
+            var files = FileSystemDictionaryFactory.CreateMiddleFileSystem();
             var paths = files.Keys.ToList();
             var fileSystem = new MockFileSystem(files);
             var initialPath = @"c:\files\mimik\spider\man\tongue";
@@ -311,25 +186,7 @@ namespace ModuleThreeSecondTaskTests
         [Fact]
         public void Class_FilterAndExcludeConditionsProvided_ReturnedOnlyFilteredAndNotExcludedFiles()
         {
-            var files = new Dictionary<string, MockFileData>
-            {
-                { @"c:\myfile.txt", new MockFileData("Testing is meh.") },
-                { @"c:\demo\jQuery.js", new MockFileData("some js") },
-                { @"c:\demo\image.gif", new MockFileData(new byte[] { 0x12, 0x34, 0x56, 0xd2 }) },
-                { @"c:\files\home.txt", new MockFileData("Testing is meh.") },
-                { @"c:\files\jQuery.js", new MockFileData("some js") },
-                { @"c:\files\sun\image.gif", new MockFileData(new byte[] { 0x12, 0x34, 0x56, 0xd2 }) },
-                { @"c:\files\sun\aaawifihsdifhish.txt", new MockFileData("Testing is meh.") },
-                { @"c:\files\zangetsu\motherland.js", new MockFileData("some js") },
-                { @"c:\files\zangetsu\moon\neiborhood.gif", new MockFileData(new byte[] { 0x12, 0x34, 0x56, 0xd2 }) },
-                { @"c:\files\stand\here\comrad\sunday.txt", new MockFileData("Testing is meh.") },
-                { @"c:\files\mimik\spider\man\tongue\control\panel\MilesMorales.js", new MockFileData("some js") },
-                { @"c:\files\mimik\spider\man\image.gif", new MockFileData(new byte[] { 0x12, 0x34, 0x56, 0xd2 }) },
-                { @"c:\files\mimik\spider\man\tongue\control\Gokuden.txt", new MockFileData("Testing is meh.") },
-                { @"c:\files\mimik\spider\man\tongue\rainbow.js", new MockFileData("some js") },
-                { @"c:\files\mimik\spider\man\tongue\colors\pink.gif", new MockFileData(new byte[] { 0x12, 0x34, 0x56, 0xd2 }) },
-                { @"c:\files\mirror\clone.txt", new MockFileData("Testing is meh.") },
-            };
+            var files = FileSystemDictionaryFactory.CreateMiddleFileSystem();
             var paths = files.Keys.ToList();
             var fileSystem = new MockFileSystem(files);
             var initialPath = @"c:\files";
@@ -355,25 +212,7 @@ namespace ModuleThreeSecondTaskTests
         [Fact]
         public void Class_OnFilteredFileFoundCounter_CountsRightTimes()
         {
-            var files = new Dictionary<string, MockFileData>
-            {
-                { @"c:\myfile.txt", new MockFileData("Testing is meh.") },
-                { @"c:\demo\jQuery.js", new MockFileData("some js") },
-                { @"c:\demo\image.gif", new MockFileData(new byte[] { 0x12, 0x34, 0x56, 0xd2 }) },
-                { @"c:\files\home.txt", new MockFileData("Testing is meh.") },
-                { @"c:\files\jQuery.js", new MockFileData("some js") },
-                { @"c:\files\sun\image.gif", new MockFileData(new byte[] { 0x12, 0x34, 0x56, 0xd2 }) },
-                { @"c:\files\sun\aaawifihsdifhish.txt", new MockFileData("Testing is meh.") },
-                { @"c:\files\zangetsu\motherland.js", new MockFileData("some js") },
-                { @"c:\files\zangetsu\moon\neiborhood.gif", new MockFileData(new byte[] { 0x12, 0x34, 0x56, 0xd2 }) },
-                { @"c:\files\stand\here\comrad\sunday.txt", new MockFileData("Testing is meh.") },
-                { @"c:\files\mimik\spider\man\tongue\control\panel\MilesMorales.js", new MockFileData("some js") },
-                { @"c:\files\mimik\spider\man\image.gif", new MockFileData(new byte[] { 0x12, 0x34, 0x56, 0xd2 }) },
-                { @"c:\files\mimik\spider\man\tongue\control\Gokuden.txt", new MockFileData("Testing is meh.") },
-                { @"c:\files\mimik\spider\man\tongue\rainbow.js", new MockFileData("some js") },
-                { @"c:\files\mimik\spider\man\tongue\colors\pink.gif", new MockFileData(new byte[] { 0x12, 0x34, 0x56, 0xd2 }) },
-                { @"c:\files\mirror\clone.txt", new MockFileData("Testing is meh.") },
-            };
+            var files = FileSystemDictionaryFactory.CreateMiddleFileSystem();
             var paths = files.Keys.ToList();
             var fileSystem = new MockFileSystem(files);
             var initialPath = @"c:\files";
