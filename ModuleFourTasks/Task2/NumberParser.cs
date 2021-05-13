@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 
 namespace Task2
 {
@@ -23,11 +22,6 @@ namespace Task2
             { '9', 9 },
         };
 
-        private int _count = 0;
-        private int _result = 0;
-        private int _resultBackup = 0;
-        private int _signMultiplier = 0;
-
         /// <summary>
         /// Parses string to integer.
         /// </summary>
@@ -35,48 +29,21 @@ namespace Task2
         /// <returns>Integer from stringValue.</returns>
         public int Parse(string stringValue)
         {
-            _resultBackup = 0;
             if (stringValue is null)
             {
                 throw new ArgumentNullException(nameof(stringValue));
             }
 
-            stringValue = FormatInput(stringValue);
-            _count = stringValue.Length;
-            try
-            {
-                stringValue.ToList().ForEach(num => ParseToResult(num));
-            }
-            finally
-            {
-                _resultBackup = _result;
-                _result = 0;
-                _count = 0;
-            }
+            var formatedInputSign = FormatInput(stringValue);
+            var formatedInput = formatedInputSign.Item1;
+            var sign = formatedInputSign.Item2;
 
-            return _resultBackup;
+            var result = GetNumberFromFormatedInput(formatedInput, sign);
+
+            return result;
         }
 
-        private void ParseToResult(char ch)
-        {
-            if (!char.IsNumber(ch))
-            {
-                throw new FormatException();
-            }
-
-            var multiplier = 1;
-            for (var times = --_count; times > 0; times--)
-            {
-                multiplier *= 10;
-            }
-
-            checked
-            {
-                _result += _signMultiplier * _charToInt[ch] * multiplier;
-            }
-        }
-
-        private string FormatInput(string input)
+        private (string, int) FormatInput(string input)
         {
             input = input.Trim();
             if (input.Length < 1 || input.IndexOf('-') > 0 || input.IndexOf('+') > 0 || input.IndexOf(' ') > -1)
@@ -84,8 +51,33 @@ namespace Task2
                 throw new FormatException();
             }
 
-            _signMultiplier = input[0] == '-' ? -1 : 1;
-            return input.Replace("-", string.Empty).Replace("+", string.Empty);
+            return new ValueTuple<string, int>(input.Replace("-", string.Empty).Replace("+", string.Empty), input[0] == '-' ? -1 : 1);
+        }
+
+        private int GetNumberFromFormatedInput(string input, int sign)
+        {
+            var result = 0;
+            var count = input.Length;
+            foreach (var charecter in input)
+            {
+                if (!_charToInt.ContainsKey(charecter))
+                {
+                    throw new FormatException();
+                }
+
+                var multiplier = 1;
+                for (var times = --count; times > 0; times--)
+                {
+                    multiplier *= 10;
+                }
+
+                checked
+                {
+                    result += sign * _charToInt[charecter] * multiplier;
+                }
+            }
+
+            return result;
         }
     }
 }
