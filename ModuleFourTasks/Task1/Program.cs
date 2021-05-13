@@ -7,9 +7,20 @@ namespace Task1
     {
         private static void Main(string[] args)
         {
-            Console.WriteLine("Enter words for abbreviation in one line.");
-            var result = Console.ReadLine();
-            var words = result.Trim().Split(' ').ToList();
+            Console.WriteLine("Enter lines for abbreviation.");
+            var result = string.Empty;
+            while (true)
+            {
+                var key = Console.ReadKey(true);
+                if (key.KeyChar == '.')
+                {
+                    break;
+                }
+
+                result += key.KeyChar.ToString();
+            }
+
+            var words = result.Trim().Replace("\0", string.Empty).Split('\r').ToList();
             words.RemoveAll(item => string.IsNullOrWhiteSpace(item));
             if (words.Count < 1)
             {
