@@ -16,13 +16,13 @@ namespace Task3
         {
             if (userId < 0)
             {
-                throw new ArgumentException("Invalid userId");
+                throw new ArgumentOutOfRangeException(null, "Invalid userId");
             }
 
             var user = _userDao.GetUser(userId);
             if (user == null)
             {
-                throw new ArgumentException("User not found");
+                throw new UserNotFoundException("User not found");
             }
 
             var tasks = user.Tasks;
@@ -30,7 +30,7 @@ namespace Task3
             {
                 if (string.Equals(task.Description, t.Description, StringComparison.OrdinalIgnoreCase))
                 {
-                    throw new ArgumentException("The task already exists");
+                    throw new InvalidOperationException("The task already exists");
                 }
             }
 

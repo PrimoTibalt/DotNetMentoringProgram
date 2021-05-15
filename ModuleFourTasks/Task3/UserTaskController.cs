@@ -31,7 +31,7 @@ namespace Task3
             {
                 _taskService.AddTaskForUser(userId, task);
             }
-            catch (ArgumentException e)
+            catch (Exception e)
             {
                 return e.Message;
             }
