@@ -13,7 +13,10 @@ namespace Task3.Tests.Stubs
         public IUser GetUser(int id)
         {
             if (_data.ContainsKey(id))
+            {
                 return _data[id];
+            }
+
             return null;
         }
     }
